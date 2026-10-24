@@ -163,7 +163,7 @@ function ProviderPayPage() {
             {/* Merchant card */}
             <div className="mt-4 flex items-center gap-3 rounded-lg bg-card p-4 shadow-sm ring-1 ring-border">
               <div
-                className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg"
+                className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-secondary ring-1 ring-border"
                 
               >
                 {info.merchant.logoUrl ? (
