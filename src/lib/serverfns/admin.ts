@@ -81,7 +81,7 @@ export const listTransactions = createServerFn({ method: "POST" })
       query = query.or(`order_id.ilike.%${q}%,trx_id.ilike.%${q}%,customer_phone.ilike.%${q}%`);
     }
     const { data: rows, error } = await query;
-    if (error) throw new Error(String(error));
+    if (error) throw new Error(error.message);
     return rows;
   });
 
@@ -105,7 +105,7 @@ export const updatePaymentStatus = createServerFn({ method: "POST" })
       patch["verified_at"] = null;
     }
     const { error } = await supabase.from("payments").update(patch).eq("id", data.id);
-    if (error) throw new Error(String(error));
+    if (error) throw new Error(error.message);
 
     // Completing a payment fires the merchant callback, same as auto-verify.
     if (data.status === "complete") {
@@ -149,7 +149,7 @@ export const listMerchants = createServerFn({ method: "GET" })
       .from("merchants")
       .select("*, merchant_accounts(*)")
       .order("created_at", { ascending: true });
-    if (error) throw new Error(String(error));
+    if (error) throw new Error(error.message);
     return data;
   });
 
@@ -220,7 +220,7 @@ export const createPaymentLink = createServerFn({ method: "POST" })
       })
       .select("id")
       .single();
-    if (error) throw new Error(String(error));
+    if (error) throw new Error(error.message);
     return { id: created["id"] as string };
   });
 
@@ -234,7 +234,7 @@ export const listApiKeys = createServerFn({ method: "GET" })
       .from("api_keys")
       .select("id, label, key_prefix, is_active, last_used_at, created_at")
       .order("created_at", { ascending: false });
-    if (error) throw new Error(String(error));
+    if (error) throw new Error(error.message);
     return data;
   });
 
@@ -254,7 +254,7 @@ export const createApiKey = createServerFn({ method: "POST" })
       })
       .select("id, key_prefix, created_at")
       .single();
-    if (error) throw new Error(String(error));
+    if (error) throw new Error(error.message);
     // Plaintext is returned exactly once — only here, never from listApiKeys.
     return { ...created, key: plaintext };
   });
@@ -268,7 +268,7 @@ export const toggleApiKey = createServerFn({ method: "POST" })
       .from("api_keys")
       .update({ is_active: data.isActive })
       .eq("id", data.id);
-    if (error) throw new Error(String(error));
+    if (error) throw new Error(error.message);
     return { ok: true };
   });
 
@@ -278,7 +278,7 @@ export const deleteApiKey = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase } = await requireAdmin(context);
     const { error } = await supabase.from("api_keys").delete().eq("id", data.id);
-    if (error) throw new Error(String(error));
+    if (error) throw new Error(error.message);
     return { ok: true };
   });
 
@@ -302,7 +302,7 @@ export const listGateway = createServerFn({ method: "GET" })
         .order("created_at", { ascending: false })
         .limit(100),
     ]);
-    if (devices.error) throw new Error(String(devices.error));
-    if (messages.error) throw new Error(String(messages.error));
+    if (devices.error) throw new Error(devices.error.message);
+    if (messages.error) throw new Error(messages.error.message);
     return { devices: devices.data ?? [], messages: messages.data ?? [] };
   });
