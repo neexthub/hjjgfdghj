@@ -91,7 +91,7 @@ export const Route = createFileRoute("/api/public/payments/create")({
           .select("id")
           .single();
         if (error || !created) {
-          return Response.json({ error: String(error ?? "Insert failed") }, { status: 500 });
+          return Response.json({ error: error?.message ?? "Insert failed" }, { status: 500 });
         }
 
         const id = created["id"] as string;

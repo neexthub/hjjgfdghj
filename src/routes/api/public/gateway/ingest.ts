@@ -65,8 +65,10 @@ export const Route = createFileRoute("/api/public/gateway/ingest")({
         const parsedRows = input.messages.flatMap((message) => {
           const parsed = parseSms(message.sender, message.body);
           if (!parsed || !parsed.trxId) return [];
-          const accountNumber = parsed.accountNumber ?? (input.phoneNumber ? normalizePhone(input.phoneNumber) : null);
+          // account_number = receiving wallet (this phone); payer_number = customer wallet from the SMS body.
+          const accountNumber = input.phoneNumber ? normalizePhone(input.phoneNumber) : null;
           return [{ parsed: { ...parsed, accountNumber }, row: {
+            payer_number: parsed.accountNumber ?? null,
             sender: message.sender, body: message.body, provider: parsed.provider,
             account_type: parsed.accountType, is_credit: parsed.isCredit,
             trx_id: parsed.trxId, amount: parsed.amount, account_number: accountNumber,
@@ -96,7 +98,7 @@ export const Route = createFileRoute("/api/public/gateway/ingest")({
             .insert(fresh.map((r) => r.row))
             .select("id");
           if (error) {
-            return Response.json({ error: String(error) }, { status: 500 });
+            return Response.json({ error: error.message }, { status: 500 });
           }
           insertedIds = (inserted ?? []).map((r) => r["id"] as string);
         }

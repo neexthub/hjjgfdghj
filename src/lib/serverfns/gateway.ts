@@ -61,16 +61,17 @@ export async function sendPaymentCallback(payment: CallbackPayment): Promise<str
   const merchant = Array.isArray(payment.merchants)
     ? payment.merchants[0] ?? null
     : payment.merchants ?? null;
-  const payload = {
-    event: "payment.completed",
-    paymentId: payment.id,
-    orderId: payment.order_id,
-    amount: Number(payment.amount),
-    trxId: payment.trx_id ?? null,
-    provider: payment.provider ?? merchant?.provider ?? "nagad",
-    status: "complete",
-    verifiedAt: payment.verified_at ?? new Date().toISOString(),
-  };
+  // Load the full stored payment + matched SMS so the store gets every TRX detail.
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const [{ data: row }, { data: sms }] = await Promise.all([
+    supabaseAdmin.from("payments").select("*").eq("id", payment.id).maybeSingle(),
+    supabaseAdmin
+      .from("sms_transactions")
+      .select("sender, body, provider, account_type, account_number, payer_number, amount, trx_id, device_id, received_at")
+      .eq("matched_payment_id", payment.id)
+      .maybeSingle(),
+  ]);
+  const payload = buildCallbackPayload(payment, row, sms, merchant);
   const raw = JSON.stringify(payload);
   const headers: Record<string, string> = { "content-type": "application/json" };
   if (merchant?.callback_secret) {
@@ -93,3 +94,51 @@ export async function sendPaymentCallback(payment: CallbackPayment): Promise<str
 }
 
 export { normalizeAccountNumber };
+
+type PaymentRow = Record<string, unknown> | null;
+type SmsRow = Record<string, unknown> | null;
+
+/** Builds the merchant callback body with every known transaction detail. */
+export function buildCallbackPayload(
+  payment: CallbackPayment,
+  row: PaymentRow,
+  sms: SmsRow,
+  merchant: MerchantInfo | null,
+) {
+  const r = row ?? {};
+  const s = sms ?? null;
+  const v = (k: string) => (r[k] ?? null) as string | null;
+  return {
+    event: "payment.completed",
+    status: "complete",
+    paymentId: payment.id,
+    gatewayTrx: v("gateway_trx"),
+    orderId: payment.order_id ?? v("order_id"),
+    storeTrx: v("store_trx"),
+    amount: Number(payment.amount),
+    currency: "BDT",
+    trxId: payment.trx_id ?? v("trx_id") ?? (s?.["trx_id"] as string | null) ?? null,
+    provider: payment.provider ?? (s?.["provider"] as string | null) ?? v("provider") ?? merchant?.provider ?? null,
+    receiverAccount: v("account_number") ?? (s?.["account_number"] as string | null) ?? null,
+    accountType: v("account_type") ?? (s?.["account_type"] as string | null) ?? null,
+    payerNumber: (s?.["payer_number"] as string | null) ?? null,
+    customer: {
+      name: v("customer_name"),
+      phone: v("customer_phone"),
+      userId: v("customer_user_id"),
+    },
+    merchant: { id: v("merchant_id"), name: merchant?.name ?? null },
+    sms: s
+      ? {
+          sender: s["sender"] ?? null,
+          body: s["body"] ?? null,
+          amount: s["amount"] != null ? Number(s["amount"]) : null,
+          deviceId: s["device_id"] ?? null,
+          receivedAt: s["received_at"] ?? null,
+        }
+      : null,
+    metadata: r["metadata"] ?? {},
+    createdAt: v("created_at"),
+    verifiedAt: payment.verified_at ?? v("verified_at") ?? new Date().toISOString(),
+  };
+}
