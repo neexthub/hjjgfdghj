@@ -14,16 +14,372 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      api_keys: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          key_hash: string
+          key_prefix: string
+          label: string
+          last_used_at: string | null
+          merchant_id: string | null
+          scope: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          key_hash: string
+          key_prefix: string
+          label: string
+          last_used_at?: string | null
+          merchant_id?: string | null
+          scope?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          key_hash?: string
+          key_prefix?: string
+          label?: string
+          last_used_at?: string | null
+          merchant_id?: string | null
+          scope?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_keys_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gateway_devices: {
+        Row: {
+          api_key_id: string | null
+          created_at: string
+          device_id: string
+          id: string
+          is_active: boolean
+          label: string | null
+          last_ip: string | null
+          last_seen_at: string | null
+          phone_number: string | null
+          platform: string
+        }
+        Insert: {
+          api_key_id?: string | null
+          created_at?: string
+          device_id: string
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          last_ip?: string | null
+          last_seen_at?: string | null
+          phone_number?: string | null
+          platform?: string
+        }
+        Update: {
+          api_key_id?: string | null
+          created_at?: string
+          device_id?: string
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          last_ip?: string | null
+          last_seen_at?: string | null
+          phone_number?: string | null
+          platform?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gateway_devices_api_key_id_fkey"
+            columns: ["api_key_id"]
+            isOneToOne: false
+            referencedRelation: "api_keys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchant_accounts: {
+        Row: {
+          account_number: string
+          account_type: string
+          created_at: string
+          id: string
+          is_active: boolean
+          merchant_id: string
+          provider: string
+        }
+        Insert: {
+          account_number: string
+          account_type?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          merchant_id: string
+          provider: string
+        }
+        Update: {
+          account_number?: string
+          account_type?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          merchant_id?: string
+          provider?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchant_accounts_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchants: {
+        Row: {
+          account_number: string | null
+          callback_api_key: string | null
+          callback_secret: string | null
+          callback_url: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          nagad_number: string
+          name: string
+          provider: string
+          success_url: string | null
+          website_origin: string | null
+        }
+        Insert: {
+          account_number?: string | null
+          callback_api_key?: string | null
+          callback_secret?: string | null
+          callback_url?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          nagad_number?: string
+          name: string
+          provider?: string
+          success_url?: string | null
+          website_origin?: string | null
+        }
+        Update: {
+          account_number?: string | null
+          callback_api_key?: string | null
+          callback_secret?: string | null
+          callback_url?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          nagad_number?: string
+          name?: string
+          provider?: string
+          success_url?: string | null
+          website_origin?: string | null
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          account_number: string | null
+          account_type: string | null
+          amount: number
+          callback_api_key: string | null
+          callback_sent_at: string | null
+          callback_status: string | null
+          callback_url: string | null
+          created_at: string
+          customer_name: string | null
+          customer_phone: string | null
+          customer_user_id: string | null
+          deleted_at: string | null
+          expires_at: string
+          gateway_trx: string
+          id: string
+          merchant_id: string
+          metadata: Json
+          order_id: string | null
+          provider: string | null
+          redirect_url: string | null
+          status: string
+          store_trx: string | null
+          trx_id: string | null
+          updated_at: string
+          user_verify_trx: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          account_number?: string | null
+          account_type?: string | null
+          amount: number
+          callback_api_key?: string | null
+          callback_sent_at?: string | null
+          callback_status?: string | null
+          callback_url?: string | null
+          created_at?: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          customer_user_id?: string | null
+          deleted_at?: string | null
+          expires_at?: string
+          gateway_trx?: string
+          id?: string
+          merchant_id: string
+          metadata?: Json
+          order_id?: string | null
+          provider?: string | null
+          redirect_url?: string | null
+          status?: string
+          store_trx?: string | null
+          trx_id?: string | null
+          updated_at?: string
+          user_verify_trx?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          account_number?: string | null
+          account_type?: string | null
+          amount?: number
+          callback_api_key?: string | null
+          callback_sent_at?: string | null
+          callback_status?: string | null
+          callback_url?: string | null
+          created_at?: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          customer_user_id?: string | null
+          deleted_at?: string | null
+          expires_at?: string
+          gateway_trx?: string
+          id?: string
+          merchant_id?: string
+          metadata?: Json
+          order_id?: string | null
+          provider?: string | null
+          redirect_url?: string | null
+          status?: string
+          store_trx?: string | null
+          trx_id?: string | null
+          updated_at?: string
+          user_verify_trx?: string | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sms_transactions: {
+        Row: {
+          account_number: string | null
+          account_type: string | null
+          amount: number | null
+          body: string
+          created_at: string
+          device_id: string | null
+          id: string
+          is_credit: boolean
+          matched_payment_id: string | null
+          provider: string | null
+          received_at: string
+          sender: string
+          trx_id: string | null
+        }
+        Insert: {
+          account_number?: string | null
+          account_type?: string | null
+          amount?: number | null
+          body: string
+          created_at?: string
+          device_id?: string | null
+          id?: string
+          is_credit?: boolean
+          matched_payment_id?: string | null
+          provider?: string | null
+          received_at?: string
+          sender: string
+          trx_id?: string | null
+        }
+        Update: {
+          account_number?: string | null
+          account_type?: string | null
+          amount?: number | null
+          body?: string
+          created_at?: string
+          device_id?: string | null
+          id?: string
+          is_credit?: boolean
+          matched_payment_id?: string | null
+          provider?: string | null
+          received_at?: string
+          sender?: string
+          trx_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_transactions_matched_payment_id_fkey"
+            columns: ["matched_payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      claim_payment_sms: {
+        Args: { p_payment: string; p_sms: string }
+        Returns: boolean
+      }
+      expire_payments: { Args: never; Returns: number }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +506,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin"],
+    },
   },
 } as const
