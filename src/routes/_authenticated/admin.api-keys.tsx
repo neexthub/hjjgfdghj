@@ -86,8 +86,8 @@ function ApiKeys() {
                 <div>
                   {edit?.id === k.id ? (
                     <form onSubmit={saveEdit} className="flex flex-wrap gap-2">
-                      <input required aria-label="Key label" value={edit.label} onChange={(e) => setEdit({ ...edit, label: e.target.value })} className={fieldClass} />
-                      <select aria-label="Key merchant" className={fieldClass} value={edit.merchantId} onChange={(e) => setEdit({ ...edit, merchantId: e.target.value })}>{stores?.map((m: any) => <option key={m.id} value={m.id}>{m.name}</option>)}</select>
+                      <input required aria-label="Key label" value={edit.label} onChange={(e) => setEdit({ ...edit!, label: e.target.value })} className={fieldClass} />
+                      <select aria-label="Key merchant" className={fieldClass} value={edit.merchantId} onChange={(e) => setEdit({ ...edit!, merchantId: e.target.value })}>{stores?.map((m: any) => <option key={m.id} value={m.id}>{m.name}</option>)}</select>
                       <Button size="sm" className="h-10">Save</Button>
                       <Button size="sm" type="button" variant="ghost" className="h-10" onClick={() => setEdit(null)}>Cancel</Button>
                     </form>
