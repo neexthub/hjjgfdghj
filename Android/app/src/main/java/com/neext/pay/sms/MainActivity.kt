@@ -40,19 +40,17 @@ class MainActivity : Activity() {
         val url = GatewayUi.field(this,"https://your-site…",config.endpoint,InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI); box.addView(url)
         box.addView(GatewayUi.text(this,"SMS API key",14f,true))
         val key = GatewayUi.field(this,"npk_…", "",InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD); box.addView(key)
-        box.addView(GatewayUi.text(this,"Receiving wallet number",14f,true))
-        val phone = GatewayUi.field(this,"01…",config.phone,InputType.TYPE_CLASS_PHONE); box.addView(phone)
         box.addView(GatewayUi.button(this,"Save & continue") {
-            try { config.save(url.text.toString(), if (key.text.isBlank() && config.configured) config.apiKey() else key.text.toString().trim(), phone.text.toString().trim()); settings() }
+            try { config.save(url.text.toString(), if (key.text.isBlank() && config.configured) config.apiKey() else key.text.toString().trim()); settings() }
             catch (e: Exception) { AlertDialog.Builder(this).setTitle("Connection settings").setMessage(e.message ?: "Settings could not be saved").setPositiveButton("OK",null).show() }
         })
         if (config.configured) box.addView(GatewayUi.button(this,"Back to dashboard") { dashboard() })
     }
-    private fun smsAllowed() = checkSelfPermission(Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED
+    private fun smsAllowed() = checkSelfPermission(Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED
     private fun settings() {
         screen = "settings"; val box = page("Gateway settings")
         box.addView(GatewayUi.text(this,if (smsAllowed()) "✓ SMS permission granted" else "SMS permission required",18f,true))
-        box.addView(GatewayUi.button(this,"SMS permission") { if (!smsAllowed()) requestPermissions(arrayOf(Manifest.permission.RECEIVE_SMS),1) else appSettings() })
+        box.addView(GatewayUi.button(this,"SMS permission") { if (!smsAllowed()) AlertDialog.Builder(this).setTitle("Wallet SMS access").setMessage("Read existing and new SMS, filter bKash, Nagad, Rocket and Upay, and send full matching messages to your configured server. Unrelated SMS stay on your phone.").setPositiveButton("Allow") { _, _ -> requestPermissions(arrayOf(Manifest.permission.RECEIVE_SMS,Manifest.permission.READ_SMS),1) }.setNegativeButton("Cancel",null).show() else appSettings() })
         val notifications = NotificationManagerCompat.from(this).areNotificationsEnabled()
         box.addView(GatewayUi.text(this,if (notifications) "✓ Status notifications enabled" else "Notifications are disabled"))
         box.addView(GatewayUi.button(this,"Notification settings") {
@@ -68,7 +66,6 @@ class MainActivity : Activity() {
     private fun dashboard() {
         screen = "dashboard"; val box = page("SMS gateway")
         box.addView(GatewayUi.text(this,if (config.enabled) "● Gateway enabled" else "○ Gateway stopped",20f,true).apply { setTextColor(GatewayUi.primary) })
-        box.addView(GatewayUi.text(this,config.phone))
         box.addView(GatewayUi.text(this,"bKash · Nagad · Upay · Rocket",14f))
         val pending = SmsQueue(this).use { it.count() }
         listOf("Received" to config.prefs.getLong("received",0),"Sent" to config.prefs.getLong("sent",0),"Queued" to pending,"Matched payments" to config.prefs.getLong("matched",0)).forEach { (label,count) ->
@@ -81,7 +78,7 @@ class MainActivity : Activity() {
         box.addView(GatewayUi.button(this,if (config.enabled) "Stop gateway" else "Start gateway") {
             if (config.enabled) { config.enabled = false; DeliveryWorker.cancel(this); stopService(Intent(this,GatewayService::class.java)); dashboard() }
             else if (!smsAllowed()) settings()
-            else { config.enabled = true; if (GatewayService.start(this)) { DeliveryWorker.periodic(this); DeliveryWorker.schedule(this) } else config.enabled = false; dashboard() }
+            else { config.enabled = true; if (GatewayService.start(this)) { InboxWorker.schedule(this); DeliveryWorker.periodic(this); DeliveryWorker.schedule(this) } else config.enabled = false; dashboard() }
         })
         box.addView(GatewayUi.button(this,"Retry queued messages") { if (config.enabled) { DeliveryWorker.schedule(this); Toast.makeText(this,"Delivery scheduled",Toast.LENGTH_SHORT).show() } else Toast.makeText(this,"Start gateway first",Toast.LENGTH_SHORT).show() })
         box.addView(GatewayUi.button(this,"Settings") { settings() })

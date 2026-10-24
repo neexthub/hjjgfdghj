@@ -29,9 +29,11 @@ Content-Type: application/json
     <Example title="৩. SMS ফোন" text={`POST /api/public/gateway/ingest
 Authorization: Bearer YOUR_SMS_PHONE_KEY
 Content-Type: application/json
-{"deviceId":"phone-1","platform":"android","phoneNumber":"01712345678","messages":[{"sender":"NAGAD","body":"You have received BDT 500.00 from 01812345678. TxnID: AB12CD34","receivedAt":"2026-10-24T12:00:00Z"}]}
+{"deviceId":"phone-1","platform":"android","messages":[{"sender":"NAGAD","body":"You have received BDT 500.00 from 01812345678. TxnID: AB12CD34","receivedAt":"2026-10-24T12:00:00Z"}]}
 // { received, parsed, stored, matched }
-// phoneNumber = receiving wallet, NOT customer's wallet.
+// SMS key must be bound to its merchant; no receiving number in the app.
+// One active account per provider/type; ambiguous accounts remain unmatched.
+// Optional phoneNumber is accepted for older senders.
 // Up to 200 messages; sender 1–64, body 1–4000 characters.`} />
     <Example title="৪. স্টোর callback" text={`POST your callbackUrl
 x-neextpay-signature: sha256=<HMAC-SHA256 of exact raw JSON body>

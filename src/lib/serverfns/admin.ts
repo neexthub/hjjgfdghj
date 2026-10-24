@@ -247,6 +247,9 @@ export const createApiKey = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase } = await requireAdmin(context);
     const plaintext = "npk_" + randomHex(24);
+    if (!data.merchantId) throw new Error("Select a merchant for this API key");
+    const { data: merchant } = await supabase.from("merchants").select("id").eq("id", data.merchantId).eq("is_active", true).maybeSingle();
+    if (!merchant) throw new Error("Merchant not found or inactive");
     const keyHash = await sha256Hex(plaintext);
     const { data: created, error } = await supabase
       .from("api_keys")
@@ -255,7 +258,7 @@ export const createApiKey = createServerFn({ method: "POST" })
         key_hash: keyHash,
         key_prefix: plaintext.slice(0, 12),
         scope: data.scope ?? "ingest",
-        merchant_id: data.scope === "store" ? data.merchantId || null : null,
+        merchant_id: data.merchantId,
       })
       .select("id, key_prefix, created_at")
       .single();
