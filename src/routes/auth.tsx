@@ -53,9 +53,7 @@ function AuthPage() {
         if (data.session) {
           navigate({ to: "/admin" });
         } else {
-          setNotice(
-            "Check your email to confirm the account. After confirming, sign in here. Admin access requires approval.",
-          );
+          setNotice("Account created. Sign in to open the admin dashboard.");
         }
       }
     } catch (err) {
