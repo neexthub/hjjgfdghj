@@ -6,7 +6,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Copy, KeyRound, Smartphone } from "lucide-react";
 import { toast } from "sonner";
-import { createApiKey, deleteApiKey, listApiKeys, listGateway, listMerchants, toggleApiKey } from "@/lib/serverfns/admin";
+import { createApiKey, deleteApiKey, listApiKeys, listGateway, listMerchants, revealApiKey, toggleApiKey, updateApiKey } from "@/lib/serverfns/admin";
 import { EmptyState, LoadingRows, PageHeader, Panel, StatusBadge, fieldClass } from "@/components/admin-ui";
 import { StoreApiGuide } from "@/components/store-api-guide";
 import { SmsAppGuide } from "@/components/sms-app-guide";
@@ -23,6 +23,9 @@ function ApiKeys() {
   const toggle = useServerFn(toggleApiKey);
   const remove = useServerFn(deleteApiKey);
   const gateway = useServerFn(listGateway);
+  const reveal = useServerFn(revealApiKey);
+  const update = useServerFn(updateApiKey);
+  const [edit, setEdit] = useState<{ id: string; label: string; merchantId: string } | null>(null);
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ["keys"], queryFn: () => list() });
   const { data: gw } = useQuery({ queryKey: ["gateway"], queryFn: () => gateway() });
@@ -42,6 +45,16 @@ function ApiKeys() {
     } catch (x) { toast.error((x as Error).message); }
   }
 
+  async function copyKey(id: string) {
+    try { const r = await reveal({ data: { id } }); await navigator.clipboard.writeText(r.key); toast.success("Key copied"); }
+    catch (x) { toast.error((x as Error).message); }
+  }
+
+  async function saveEdit(e: React.FormEvent) {
+    e.preventDefault(); if (!edit) return;
+    try { await update({ data: edit }); setEdit(null); toast.success("Key updated"); refresh(); } catch (x) { toast.error((x as Error).message); }
+  }
+
   async function del(id: string) {
     if (!confirm("Delete this key? Apps using it will stop working.")) return;
     try { await remove({ data: { id } }); refresh(); } catch (x) { toast.error((x as Error).message); }
@@ -59,7 +72,7 @@ function ApiKeys() {
         </form>
         {fresh && (
           <div className="m-5 rounded-lg border border-primary/40 bg-accent p-4">
-            <p className="text-sm font-semibold text-accent-foreground">Copy this key now — it won't be shown again.</p>
+            <p className="text-sm font-semibold text-accent-foreground">New key created — you can copy it again anytime from the list.</p>
             <div className="mt-2 flex items-center gap-2">
               <code className="min-w-0 flex-1 break-all rounded bg-card px-3 py-2 font-mono text-sm">{fresh}</code>
               <Button variant="outline" size="icon" aria-label="Copy key" onClick={() => { navigator.clipboard.writeText(fresh); toast.success("Key copied"); }}><Copy /></Button>
@@ -71,10 +84,21 @@ function ApiKeys() {
             {data.map((k: any) => (
               <div key={k.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
                 <div>
-                  <div className="flex items-center gap-2"><p className="font-semibold">{k.label}</p><StatusBadge status={k.is_active ? "active" : "inactive"} /></div>
+                  {edit?.id === k.id ? (
+                    <form onSubmit={saveEdit} className="flex flex-wrap gap-2">
+                      <input required aria-label="Key label" value={edit.label} onChange={(e) => setEdit({ ...edit, label: e.target.value })} className={fieldClass} />
+                      <select aria-label="Key merchant" className={fieldClass} value={edit.merchantId} onChange={(e) => setEdit({ ...edit, merchantId: e.target.value })}>{stores?.map((m: any) => <option key={m.id} value={m.id}>{m.name}</option>)}</select>
+                      <Button size="sm" className="h-10">Save</Button>
+                      <Button size="sm" type="button" variant="ghost" className="h-10" onClick={() => setEdit(null)}>Cancel</Button>
+                    </form>
+                  ) : (<>
+                  <div className="flex items-center gap-2"><p className="font-semibold">{k.label}</p><span className="text-xs text-muted-foreground">{stores?.find((m: any) => m.id === k.merchant_id)?.name}</span><StatusBadge status={k.is_active ? "active" : "inactive"} /></div>
                   <p className="mt-0.5 font-mono text-xs text-muted-foreground">{k.key_prefix}… · {k.scope} · last used {k.last_used_at ? new Date(k.last_used_at).toLocaleString() : "never"}</p>
+                  </>)}
                 </div>
-                <div className="flex gap-1">
+                <div className="flex flex-wrap gap-1">
+                  <Button size="sm" variant="outline" onClick={() => copyKey(k.id)}><Copy /> Copy</Button>
+                  <Button size="sm" variant="outline" onClick={() => setEdit({ id: k.id, label: k.label, merchantId: k.merchant_id ?? "" })}>Edit</Button>
                   <Button size="sm" variant="outline" onClick={async () => { try { await toggle({ data: { id: k.id, isActive: !k.is_active } }); refresh(); } catch (x) { toast.error((x as Error).message); } }}>{k.is_active ? "Disable" : "Enable"}</Button>
                   <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => del(k.id)}>Delete</Button>
                 </div>
