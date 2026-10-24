@@ -1,0 +1,14 @@
+<resources>
+    <color name="gateway_primary">#006E58</color>
+    <color name="gateway_surface">#F3F7F6</color>
+    <color name="gateway_text">#142522</color>
+    <color name="gateway_error">#B3261E</color>
+    <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">@color/gateway_primary</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@color/gateway_surface</item>
+        <item name="android:navigationBarColor">@color/gateway_surface</item>
+        <item name="android:windowBackground">@color/gateway_surface</item>
+    </style>
+</resources>

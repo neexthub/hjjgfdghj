@@ -1,5 +1,10 @@
 # Roadmap
 
+## Current request: Android source
+- [ ] Create Android folder with native first-run API setup, settings and dashboard.
+- [ ] Add SMS receiver, durable offline queue/retries, foreground notification and recovery controls.
+- [ ] Add local build guide and verify source/tests; report device/build limitations.
+
 ## Current request: app loading
 - [ ] Fix the missing /index entry and verify homepage navigation in a live browser.
 

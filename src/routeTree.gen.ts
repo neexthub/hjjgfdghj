@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as Char91indexChar93RouteImport } from './routes/[index]'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -26,6 +27,11 @@ import { Route as ApiPublicPayIdRouteImport } from './routes/api/public/pay/$id'
 import { Route as ApiPublicPaymentsCreateRouteImport } from './routes/api/public/payments/create'
 import { Route as ApiPublicPaymentsVerifyRouteImport } from './routes/api/public/payments/verify'
 
+const Char91indexChar93Route = Char91indexChar93RouteImport.update({
+  id: '/index',
+  path: '/index',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -112,6 +118,7 @@ const ApiPublicPaymentsVerifyRoute = ApiPublicPaymentsVerifyRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/index': typeof Char91indexChar93Route
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/pay/$id': typeof PayIdRouteWithChildren
   '/admin/api-keys': typeof AuthenticatedAdminApiKeysRoute
@@ -129,6 +136,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/index': typeof Char91indexChar93Route
   '/admin/api-keys': typeof AuthenticatedAdminApiKeysRoute
   '/admin/links': typeof AuthenticatedAdminLinksRoute
   '/admin/merchants': typeof AuthenticatedAdminMerchantsRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/index': typeof Char91indexChar93Route
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/pay/$id': typeof PayIdRouteWithChildren
   '/_authenticated/admin/api-keys': typeof AuthenticatedAdminApiKeysRoute
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/index'
     | '/admin'
     | '/pay/$id'
     | '/admin/api-keys'
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/index'
     | '/admin/api-keys'
     | '/admin/links'
     | '/admin/merchants'
@@ -198,6 +209,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/index'
     | '/_authenticated/admin'
     | '/pay/$id'
     | '/_authenticated/admin/api-keys'
@@ -217,6 +229,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  Char91indexChar93Route: typeof Char91indexChar93Route
   PayIdRoute: typeof PayIdRouteWithChildren
   ApiPublicGatewayIngestRoute: typeof ApiPublicGatewayIngestRoute
   ApiPublicPayIdRoute: typeof ApiPublicPayIdRoute
@@ -226,6 +239,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/index': {
+      id: '/index'
+      path: '/index'
+      fullPath: '/index'
+      preLoaderRoute: typeof Char91indexChar93RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -387,6 +407,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  Char91indexChar93Route: Char91indexChar93Route,
   PayIdRoute: PayIdRouteWithChildren,
   ApiPublicGatewayIngestRoute: ApiPublicGatewayIngestRoute,
   ApiPublicPayIdRoute: ApiPublicPayIdRoute,
