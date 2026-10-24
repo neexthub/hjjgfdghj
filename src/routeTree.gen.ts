@@ -10,33 +10,218 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as PayIdRouteImport } from './routes/pay.$id'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminApiKeysRouteImport } from './routes/_authenticated/admin.api-keys'
+import { Route as AuthenticatedAdminLinksRouteImport } from './routes/_authenticated/admin.links'
+import { Route as AuthenticatedAdminMerchantsRouteImport } from './routes/_authenticated/admin.merchants'
+import { Route as AuthenticatedAdminTransactionsRouteImport } from './routes/_authenticated/admin.transactions'
+import { Route as PayIdIndexRouteImport } from './routes/pay.$id.index'
+import { Route as PayIdProviderRouteImport } from './routes/pay.$id.$provider'
+import { Route as ApiPublicGatewayIngestRouteImport } from './routes/api/public/gateway/ingest'
+import { Route as ApiPublicPayIdRouteImport } from './routes/api/public/pay/$id'
+import { Route as ApiPublicPaymentsCreateRouteImport } from './routes/api/public/payments/create'
+import { Route as ApiPublicPaymentsVerifyRouteImport } from './routes/api/public/payments/verify'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const PayIdRoute = PayIdRouteImport.update({
+  id: '/pay/$id',
+  path: '/pay/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminApiKeysRoute =
+  AuthenticatedAdminApiKeysRouteImport.update({
+    id: '/api-keys',
+    path: '/api-keys',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminLinksRoute = AuthenticatedAdminLinksRouteImport.update({
+  id: '/links',
+  path: '/links',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminMerchantsRoute =
+  AuthenticatedAdminMerchantsRouteImport.update({
+    id: '/merchants',
+    path: '/merchants',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminTransactionsRoute =
+  AuthenticatedAdminTransactionsRouteImport.update({
+    id: '/transactions',
+    path: '/transactions',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const PayIdIndexRoute = PayIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PayIdRoute,
+} as any)
+const PayIdProviderRoute = PayIdProviderRouteImport.update({
+  id: '/$provider',
+  path: '/$provider',
+  getParentRoute: () => PayIdRoute,
+} as any)
+const ApiPublicGatewayIngestRoute = ApiPublicGatewayIngestRouteImport.update({
+  id: '/api/public/gateway/ingest',
+  path: '/api/public/gateway/ingest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicPayIdRoute = ApiPublicPayIdRouteImport.update({
+  id: '/api/public/pay/$id',
+  path: '/api/public/pay/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicPaymentsCreateRoute = ApiPublicPaymentsCreateRouteImport.update({
+  id: '/api/public/payments/create',
+  path: '/api/public/payments/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicPaymentsVerifyRoute = ApiPublicPaymentsVerifyRouteImport.update({
+  id: '/api/public/payments/verify',
+  path: '/api/public/payments/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/pay/$id': typeof PayIdRouteWithChildren
+  '/admin/api-keys': typeof AuthenticatedAdminApiKeysRoute
+  '/admin/links': typeof AuthenticatedAdminLinksRoute
+  '/admin/merchants': typeof AuthenticatedAdminMerchantsRoute
+  '/admin/transactions': typeof AuthenticatedAdminTransactionsRoute
+  '/pay/$id/$provider': typeof PayIdProviderRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/pay/$id/': typeof PayIdIndexRoute
+  '/api/public/gateway/ingest': typeof ApiPublicGatewayIngestRoute
+  '/api/public/pay/$id': typeof ApiPublicPayIdRoute
+  '/api/public/payments/create': typeof ApiPublicPaymentsCreateRoute
+  '/api/public/payments/verify': typeof ApiPublicPaymentsVerifyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/admin/api-keys': typeof AuthenticatedAdminApiKeysRoute
+  '/admin/links': typeof AuthenticatedAdminLinksRoute
+  '/admin/merchants': typeof AuthenticatedAdminMerchantsRoute
+  '/admin/transactions': typeof AuthenticatedAdminTransactionsRoute
+  '/pay/$id/$provider': typeof PayIdProviderRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
+  '/pay/$id': typeof PayIdIndexRoute
+  '/api/public/gateway/ingest': typeof ApiPublicGatewayIngestRoute
+  '/api/public/pay/$id': typeof ApiPublicPayIdRoute
+  '/api/public/payments/create': typeof ApiPublicPaymentsCreateRoute
+  '/api/public/payments/verify': typeof ApiPublicPaymentsVerifyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/pay/$id': typeof PayIdRouteWithChildren
+  '/_authenticated/admin/api-keys': typeof AuthenticatedAdminApiKeysRoute
+  '/_authenticated/admin/links': typeof AuthenticatedAdminLinksRoute
+  '/_authenticated/admin/merchants': typeof AuthenticatedAdminMerchantsRoute
+  '/_authenticated/admin/transactions': typeof AuthenticatedAdminTransactionsRoute
+  '/pay/$id/$provider': typeof PayIdProviderRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/pay/$id/': typeof PayIdIndexRoute
+  '/api/public/gateway/ingest': typeof ApiPublicGatewayIngestRoute
+  '/api/public/pay/$id': typeof ApiPublicPayIdRoute
+  '/api/public/payments/create': typeof ApiPublicPaymentsCreateRoute
+  '/api/public/payments/verify': typeof ApiPublicPaymentsVerifyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/pay/$id'
+    | '/admin/api-keys'
+    | '/admin/links'
+    | '/admin/merchants'
+    | '/admin/transactions'
+    | '/pay/$id/$provider'
+    | '/admin/'
+    | '/pay/$id/'
+    | '/api/public/gateway/ingest'
+    | '/api/public/pay/$id'
+    | '/api/public/payments/create'
+    | '/api/public/payments/verify'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/admin/api-keys'
+    | '/admin/links'
+    | '/admin/merchants'
+    | '/admin/transactions'
+    | '/pay/$id/$provider'
+    | '/admin'
+    | '/pay/$id'
+    | '/api/public/gateway/ingest'
+    | '/api/public/pay/$id'
+    | '/api/public/payments/create'
+    | '/api/public/payments/verify'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/admin'
+    | '/pay/$id'
+    | '/_authenticated/admin/api-keys'
+    | '/_authenticated/admin/links'
+    | '/_authenticated/admin/merchants'
+    | '/_authenticated/admin/transactions'
+    | '/pay/$id/$provider'
+    | '/_authenticated/admin/'
+    | '/pay/$id/'
+    | '/api/public/gateway/ingest'
+    | '/api/public/pay/$id'
+    | '/api/public/payments/create'
+    | '/api/public/payments/verify'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  PayIdRoute: typeof PayIdRouteWithChildren
+  ApiPublicGatewayIngestRoute: typeof ApiPublicGatewayIngestRoute
+  ApiPublicPayIdRoute: typeof ApiPublicPayIdRoute
+  ApiPublicPaymentsCreateRoute: typeof ApiPublicPaymentsCreateRoute
+  ApiPublicPaymentsVerifyRoute: typeof ApiPublicPaymentsVerifyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +233,165 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/pay/$id': {
+      id: '/pay/$id'
+      path: '/pay/$id'
+      fullPath: '/pay/$id'
+      preLoaderRoute: typeof PayIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/api-keys': {
+      id: '/_authenticated/admin/api-keys'
+      path: '/api-keys'
+      fullPath: '/admin/api-keys'
+      preLoaderRoute: typeof AuthenticatedAdminApiKeysRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/links': {
+      id: '/_authenticated/admin/links'
+      path: '/links'
+      fullPath: '/admin/links'
+      preLoaderRoute: typeof AuthenticatedAdminLinksRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/merchants': {
+      id: '/_authenticated/admin/merchants'
+      path: '/merchants'
+      fullPath: '/admin/merchants'
+      preLoaderRoute: typeof AuthenticatedAdminMerchantsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/transactions': {
+      id: '/_authenticated/admin/transactions'
+      path: '/transactions'
+      fullPath: '/admin/transactions'
+      preLoaderRoute: typeof AuthenticatedAdminTransactionsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/pay/$id/': {
+      id: '/pay/$id/'
+      path: '/'
+      fullPath: '/pay/$id/'
+      preLoaderRoute: typeof PayIdIndexRouteImport
+      parentRoute: typeof PayIdRoute
+    }
+    '/pay/$id/$provider': {
+      id: '/pay/$id/$provider'
+      path: '/$provider'
+      fullPath: '/pay/$id/$provider'
+      preLoaderRoute: typeof PayIdProviderRouteImport
+      parentRoute: typeof PayIdRoute
+    }
+    '/api/public/gateway/ingest': {
+      id: '/api/public/gateway/ingest'
+      path: '/api/public/gateway/ingest'
+      fullPath: '/api/public/gateway/ingest'
+      preLoaderRoute: typeof ApiPublicGatewayIngestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/pay/$id': {
+      id: '/api/public/pay/$id'
+      path: '/api/public/pay/$id'
+      fullPath: '/api/public/pay/$id'
+      preLoaderRoute: typeof ApiPublicPayIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/payments/create': {
+      id: '/api/public/payments/create'
+      path: '/api/public/payments/create'
+      fullPath: '/api/public/payments/create'
+      preLoaderRoute: typeof ApiPublicPaymentsCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/payments/verify': {
+      id: '/api/public/payments/verify'
+      path: '/api/public/payments/verify'
+      fullPath: '/api/public/payments/verify'
+      preLoaderRoute: typeof ApiPublicPaymentsVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminApiKeysRoute: typeof AuthenticatedAdminApiKeysRoute
+  AuthenticatedAdminLinksRoute: typeof AuthenticatedAdminLinksRoute
+  AuthenticatedAdminMerchantsRoute: typeof AuthenticatedAdminMerchantsRoute
+  AuthenticatedAdminTransactionsRoute: typeof AuthenticatedAdminTransactionsRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminApiKeysRoute: AuthenticatedAdminApiKeysRoute,
+  AuthenticatedAdminLinksRoute: AuthenticatedAdminLinksRoute,
+  AuthenticatedAdminMerchantsRoute: AuthenticatedAdminMerchantsRoute,
+  AuthenticatedAdminTransactionsRoute: AuthenticatedAdminTransactionsRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+interface PayIdRouteChildren {
+  PayIdProviderRoute: typeof PayIdProviderRoute
+  PayIdIndexRoute: typeof PayIdIndexRoute
+}
+
+const PayIdRouteChildren: PayIdRouteChildren = {
+  PayIdProviderRoute: PayIdProviderRoute,
+  PayIdIndexRoute: PayIdIndexRoute,
+}
+
+const PayIdRouteWithChildren = PayIdRoute._addFileChildren(PayIdRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  PayIdRoute: PayIdRouteWithChildren,
+  ApiPublicGatewayIngestRoute: ApiPublicGatewayIngestRoute,
+  ApiPublicPayIdRoute: ApiPublicPayIdRoute,
+  ApiPublicPaymentsCreateRoute: ApiPublicPaymentsCreateRoute,
+  ApiPublicPaymentsVerifyRoute: ApiPublicPaymentsVerifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
