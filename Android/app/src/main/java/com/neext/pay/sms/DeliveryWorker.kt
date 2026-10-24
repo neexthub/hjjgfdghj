@@ -20,7 +20,7 @@ class DeliveryWorker(context: Context, params: WorkerParameters) : Worker(contex
                 if (rows.isEmpty()) return Result.success()
                 val messages = JSONArray()
                 rows.forEach { messages.put(JSONObject().put("sender", it.sender).put("body", it.body).put("receivedAt", it.receivedAt)) }
-                val payload = JSONObject().put("deviceId", config.deviceId).put("platform", "android").put("phoneNumber", config.phone).put("messages", messages)
+                val payload = JSONObject().put("deviceId", config.deviceId).put("platform", "android").put("messages", messages)
                 val connection = URL(config.endpoint).openConnection() as HttpsURLConnection
                 try {
                     connection.requestMethod = "POST"; connection.connectTimeout = 15000; connection.readTimeout = 30000; connection.doOutput = true
@@ -37,9 +37,9 @@ class DeliveryWorker(context: Context, params: WorkerParameters) : Worker(contex
                         val prefs = config.prefs
                         prefs.edit().putLong("sent", prefs.getLong("sent", 0) + rows.size).putLong("matched", prefs.getLong("matched", 0) + response.optInt("matched"))
                             .putLong("last_success", System.currentTimeMillis()).apply()
-                        config.status("SMS পাঠানো সফল")
+                        config.status(if (response.optInt("unresolved") > 0) "SMS পাঠানো হয়েছে — Admin-এ কী ও collection account যাচাই করুন" else "SMS পাঠানো সফল")
                     } else {
-                        config.status(when (code) { 401 -> "API key ভুল/বন্ধ — Settings ঠিক করুন"; 403 -> "Device অন্য key-তে যুক্ত/বন্ধ — Admin যাচাই করুন"; 400 -> "API URL/নম্বর/বার্তা যাচাই করুন"; else -> "HTTP $code — আবার চেষ্টা হবে" })
+                        config.status(when (code) { 401 -> "API key ভুল/বন্ধ — Settings ঠিক করুন"; 403 -> "Device/key/store যাচাই করুন"; 400 -> "API URL/বার্তা যাচাই করুন"; else -> "HTTP $code — আবার চেষ্টা হবে" })
                         GatewayService.refresh(applicationContext)
                         return if (code in listOf(400,401,403,404,410,413,422) || code in 300..399) Result.failure() else Result.retry()
                     }
@@ -62,6 +62,6 @@ class DeliveryWorker(context: Context, params: WorkerParameters) : Worker(contex
             val request = PeriodicWorkRequestBuilder<DeliveryWorker>(15, TimeUnit.MINUTES).setConstraints(constraints()).setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS).build()
             WorkManager.getInstance(context).enqueueUniquePeriodicWork("sms-recovery", ExistingPeriodicWorkPolicy.KEEP, request)
         }
-        fun cancel(context: Context) { WorkManager.getInstance(context).cancelUniqueWork("sms-send"); WorkManager.getInstance(context).cancelUniqueWork("sms-recovery") }
+        fun cancel(context: Context) { WorkManager.getInstance(context).cancelUniqueWork("sms-send"); WorkManager.getInstance(context).cancelUniqueWork("sms-recovery"); WorkManager.getInstance(context).cancelUniqueWork("sms-inbox") }
     }
 }

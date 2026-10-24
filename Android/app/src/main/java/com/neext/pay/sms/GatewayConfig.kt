@@ -17,8 +17,7 @@ class GatewayConfig(context: Context) {
         get() = prefs.getBoolean("enabled", false)
         set(value) { prefs.edit().putBoolean("enabled", value).commit() }
     val endpoint get() = prefs.getString("endpoint", "").orEmpty()
-    val phone get() = prefs.getString("phone", "").orEmpty()
-    val configured get() = endpoint.isNotEmpty() && phone.isNotEmpty() && prefs.contains("key")
+    val configured get() = endpoint.isNotEmpty() && prefs.contains("key")
     val deviceId: String get() {
         val old = prefs.getString("device", null)
         if (old != null) return old
@@ -37,13 +36,12 @@ class GatewayConfig(context: Context) {
         cipher.init(Cipher.DECRYPT_MODE, secret(), GCMParameterSpec(128, Base64.decode(prefs.getString("iv", ""), Base64.NO_WRAP)))
         return String(cipher.doFinal(Base64.decode(prefs.getString("key", ""), Base64.NO_WRAP)), Charsets.UTF_8)
     }
-    fun save(url: String, key: String, number: String) {
+    fun save(url: String, key: String) {
         val normalized = GatewayRules.endpoint(url)
         require(key.startsWith("npk_") && key.length in 20..128) { "SMS phone API key দিন" }
-        require(GatewayRules.validPhone(number)) { "সঠিক receiving wallet নম্বর দিন" }
         val cipher = Cipher.getInstance("AES/GCM/NoPadding").apply { init(Cipher.ENCRYPT_MODE, secret()) }
         val encrypted = cipher.doFinal(key.toByteArray(Charsets.UTF_8))
-        prefs.edit().putString("endpoint", normalized).putString("phone", number)
+        prefs.edit().putString("endpoint", normalized).remove("phone")
             .putString("key", Base64.encodeToString(encrypted, Base64.NO_WRAP)).putString("iv", Base64.encodeToString(cipher.iv, Base64.NO_WRAP)).commit()
     }
     fun status(message: String) { prefs.edit().putString("status", message).apply() }

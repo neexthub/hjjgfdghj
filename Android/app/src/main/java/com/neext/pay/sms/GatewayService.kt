@@ -29,7 +29,7 @@ class GatewayService : Service() {
             val pending = SmsQueue(context).use { it.count() }
             val open = PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             val stop = PendingIntent.getService(context, 1, Intent(context, GatewayService::class.java).setAction("STOP"), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-            val detail = "${config.phone} · Received ${p.getLong("received",0)} · Sent ${p.getLong("sent",0)} · Queue $pending · Matched ${p.getLong("matched",0)}\n${p.getString("status", "SMS-এর অপেক্ষায়") }"
+            val detail = "Received ${p.getLong("received",0)} · Sent ${p.getLong("sent",0)} · Queue $pending · Matched ${p.getLong("matched",0)}\n${p.getString("status", "SMS-এর অপেক্ষায়") }"
             return NotificationCompat.Builder(context, "gateway").setSmallIcon(R.drawable.ic_gateway).setContentTitle("Neext Pay • SMS gateway")
                 .setContentText("Sent ${p.getLong("sent",0)} · Queue $pending").setStyle(NotificationCompat.BigTextStyle().bigText(detail))
                 .setContentIntent(open).setOngoing(true).setOnlyAlertOnce(true).setSilent(true).addAction(0, "Settings", open).addAction(0, "Stop", stop).build()

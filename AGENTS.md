@@ -17,3 +17,5 @@
 - Keep external URL validation in a shared client-safe API contract and document the actual endpoint contracts in the admin API section.
 - Keep the native Android gateway in Android with encrypted configuration, SQLite delivery queue, WorkManager retries and a foreground status service so SMS survives network interruptions without polling loops.
 - Build Android releases outside the web build, serve only verified signed APKs from public/downloads, and keep signing material outside source control so downloads never expose private keys.
+- Resolve number-free SMS receivers from the merchant-bound ingest key and a unique provider/type collection account; leave ambiguous messages unmatched to prevent cross-store verification.
+- Import existing wallet SMS once through WorkManager after explicit read permission, while retaining the broadcast receiver for new messages to avoid continuous inbox polling.

@@ -40,7 +40,7 @@ export const Route = createFileRoute("/api/public/payments/verify")({
         const { data: payment } = await supabaseAdmin
           .from("payments")
           .select(
-            "id, amount, status, order_id, trx_id, callback_url, redirect_url, verified_at, provider, account_number, account_type, expires_at, deleted_at, merchants(name, provider, account_number, callback_secret)",
+            "id, amount, status, order_id, trx_id, callback_url, redirect_url, verified_at, provider, account_number, account_type, created_at, expires_at, deleted_at, merchants(name, provider, account_number, callback_secret)",
           )
           .eq("id", parsedInput.data.paymentId)
           .maybeSingle();
@@ -64,6 +64,7 @@ export const Route = createFileRoute("/api/public/payments/verify")({
           .select("id, amount, account_number, provider, account_type, is_credit, matched_payment_id")
           .eq("trx_id", trx)
           .eq("is_credit", true)
+          .gte("received_at", payment.created_at)
           .is("matched_payment_id", null)
           .order("created_at", { ascending: true })
           .limit(1)

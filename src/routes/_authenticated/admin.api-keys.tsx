@@ -53,7 +53,7 @@ function ApiKeys() {
         <form onSubmit={add} className="flex flex-wrap gap-2 border-b border-border p-5">
           <input required placeholder="Label, e.g. Android phone 1" value={label} onChange={(e) => setLabel(e.target.value)} className={`${fieldClass} min-w-56 flex-1`} />
           <select aria-label="Key scope" className={fieldClass} value={scope} onChange={(e) => setScope(e.target.value as "store" | "ingest")}><option value="store">Store API</option><option value="ingest">SMS phone</option></select>
-          {scope === "store" && <select required aria-label="Key merchant" className={fieldClass} value={merchantId} onChange={(e) => setMerchantId(e.target.value)}><option value="">Select merchant</option>{stores?.filter((m: any) => m.is_active).map((m: any) => <option key={m.id} value={m.id}>{m.name}</option>)}</select>}
+          <select required aria-label="Key merchant" className={fieldClass} value={merchantId} onChange={(e) => setMerchantId(e.target.value)}><option value="">Select merchant</option>{stores?.filter((m: any) => m.is_active).map((m: any) => <option key={m.id} value={m.id}>{m.name}</option>)}</select>
           <Button className="h-10"><KeyRound /> Create key</Button>
         </form>
         {fresh && (

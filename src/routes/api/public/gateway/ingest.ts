@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { z } from "zod";
+import { ingestSchema, resolveSmsAccount } from "@/lib/sms-account";
 import { parseSms, normalizePhone } from "@/lib/sms";
 import { authenticateApiKey, sendPaymentCallback } from "@/lib/serverfns/gateway";
 
@@ -10,18 +10,6 @@ import { authenticateApiKey, sendPaymentCallback } from "@/lib/serverfns/gateway
  * Parses every message with the best-format reader, stores it, and auto-matches
  * credit SMS to pending payments (provider + amount + unused TRX).
  */
-const messageSchema = z.object({
-  sender: z.string().min(1).max(64),
-  body: z.string().min(1).max(4000),
-  receivedAt: z.string().datetime().optional(),
-});
-
-const ingestSchema = z.object({
-  deviceId: z.string().min(1).max(64),
-  platform: z.enum(["android", "ios", "other"]).default("android"),
-  phoneNumber: z.string().regex(/^(?:\+?88)?01[3-9][0-9]{8,9}$/),
-  messages: z.array(messageSchema).min(1).max(200),
-});
 
 export const Route = createFileRoute("/api/public/gateway/ingest")({
   server: {
@@ -46,6 +34,7 @@ export const Route = createFileRoute("/api/public/gateway/ingest")({
           );
         }
         const input = parsedInput.data;
+        if (!input.phoneNumber && !apiKey.merchantId) return Response.json({ error: "Bind this SMS key to a merchant in admin before connecting without a phone number" }, { status: 403 });
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const now = new Date().toISOString();
@@ -66,12 +55,17 @@ export const Route = createFileRoute("/api/public/gateway/ingest")({
 
         if (deviceError) return Response.json({ error: "Could not register device" }, { status: 500 });
 
+        let accountQuery = supabaseAdmin.from("merchant_accounts").select("merchant_id, provider, account_type, account_number").eq("is_active", true);
+        if (apiKey.merchantId) accountQuery = accountQuery.eq("merchant_id", apiKey.merchantId);
+        const { data: accounts, error: accountError } = await accountQuery;
+        if (accountError) return Response.json({ error: "Collection accounts unavailable" }, { status: 500 });
         const parsedRows = input.messages.flatMap((message) => {
           const parsed = parseSms(message.sender, message.body);
           if (!parsed || !parsed.trxId) return [];
           // account_number = receiving wallet (this phone); payer_number = customer wallet from the SMS body.
-          const accountNumber = input.phoneNumber ? normalizePhone(input.phoneNumber) : null;
-          return [{ parsed: { ...parsed, accountNumber }, row: {
+          const resolved = resolveSmsAccount(accounts ?? [], apiKey.merchantId, parsed.provider, parsed.accountType, input.phoneNumber ?? null);
+          const accountNumber = resolved?.account_number ?? null;
+          return [{ merchantId: resolved?.merchant_id ?? null, parsed: { ...parsed, accountNumber }, row: {
             payer_number: parsed.isCredit ? parsed.counterparty : null,
             sender: message.sender, body: message.body, provider: parsed.provider,
             account_type: parsed.accountType, is_credit: parsed.isCredit,
@@ -113,13 +107,15 @@ export const Route = createFileRoute("/api/public/gateway/ingest")({
           const entry = fresh[i];
           if (!entry) continue;
           const { parsed } = entry;
-          if (!parsed.isCredit || !parsed.trxId || parsed.amount == null) continue;
+          if (!entry.merchantId || !parsed.isCredit || !parsed.trxId || parsed.amount == null) continue;
           const { data: pending } = await supabaseAdmin
             .from("payments")
             .select(
               "id, amount, order_id, status, callback_url, trx_id, verified_at, provider, account_number, account_type, merchants(name, provider, account_number, callback_secret)",
             )
             .eq("status", "pending")
+            .eq("merchant_id", entry.merchantId)
+            .lte("created_at", entry.row.received_at)
             .eq("amount", parsed.amount)
             .order("created_at", { ascending: true })
             .limit(50);
@@ -155,6 +151,7 @@ export const Route = createFileRoute("/api/public/gateway/ingest")({
           parsed: parsedRows.length,
           stored: insertedIds.length,
           matched,
+          unresolved: parsedRows.filter(r => !r.merchantId).length,
         });
       },
     },
