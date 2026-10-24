@@ -1,5 +1,11 @@
 # Roadmap
 
+## Current request: Android release and end-to-end QA
+- [ ] Complete branded Android setup/settings/dashboard and reliable delivery; test four-provider message rules.
+- [ ] Build and verify signed release APK; add working download in admin dashboard.
+- [ ] Verify signed-in admin and payment → SMS → callback → success redirect in a live browser.
+- [ ] Report physical-phone and production-hosting limitations; copied migration reset remains blocked by managed history rules.
+
 ## Current request: Android source
 - [ ] Create Android folder with native first-run API setup, settings and dashboard.
 - [ ] Add SMS receiver, durable offline queue/retries, foreground notification and recovery controls.
