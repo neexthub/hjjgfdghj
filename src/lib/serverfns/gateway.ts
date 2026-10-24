@@ -22,22 +22,22 @@ export function unwrapMerchant(row: unknown): MerchantInfo | null {
 }
 
 /** Validates a Bearer npk_… API key; returns the key id or null. */
-export async function authenticateApiKey(request: Request): Promise<string | null> {
+export async function authenticateApiKey(request: Request, requiredScope: "store" | "ingest"): Promise<{ id: string; merchantId: string | null } | null> {
   const header = request.headers.get("authorization") ?? "";
   const key = header.startsWith("Bearer ") ? header.slice(7).trim() : "";
   if (!key.startsWith("npk_") || key.length > 128) return null;
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
     .from("api_keys")
-    .select("id, is_active")
+    .select("id, is_active, merchant_id, scope")
     .eq("key_hash", sha256Hex(key))
     .maybeSingle();
-  if (!data || !data["is_active"]) return null;
-  void supabaseAdmin
+  if (!data || !data["is_active"] || ![requiredScope, "all"].includes(data.scope)) return null;
+  await supabaseAdmin
     .from("api_keys")
     .update({ last_used_at: new Date().toISOString() })
     .eq("id", data["id"] as string);
-  return data["id"] as string;
+  return { id: data.id, merchantId: data.merchant_id };
 }
 
 export type CallbackPayment = {
@@ -54,7 +54,7 @@ export type CallbackPayment = {
 /**
  * POSTs the completion payload to the merchant's callback URL, signed with the
  * merchant's callback secret (HMAC-SHA256 over the raw body,
- * `x-nagadpay-signature: sha256=<hex>`). Returns a status string for logging.
+ * `x-neextpay-signature: sha256=<hex>`). Returns a status string for logging.
  */
 export async function sendPaymentCallback(payment: CallbackPayment): Promise<string> {
   if (!payment.callback_url) return "no_url";

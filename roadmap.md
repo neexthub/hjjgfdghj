@@ -1,5 +1,11 @@
 # Roadmap
 
+## Current request: live QA and store API guide
+- [x] Add admin store API guide with request, response, callback and key examples.
+- [x] Test public pages, checkout and API-key authenticated create → SMS → verify → callback → redirect.
+- [x] Fix discovered functional failures and retain regression tests.
+- [ ] Test signed-in admin CRUD (blocked: no signed-up auth user).
+
 ## Store integration and Android SMS sender
 - [ ] Build and test downloadable Android SMS sender with offline retries.
 - [ ] Design and apply a NeextPay logo to web and Android app.

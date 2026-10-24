@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
+import { safeExternalUrl } from "@/lib/api-contract";
 import { authenticateApiKey } from "@/lib/serverfns/gateway";
 
 /**
@@ -17,16 +18,19 @@ const createSchema = z.object({
   orderId: z.string().max(120).optional(),
   customerName: z.string().max(120).optional(),
   customerPhone: z.string().max(20).optional(),
-  redirectUrl: z.string().url().max(2000).optional(),
-  callbackUrl: z.string().url().max(2000).optional(),
+  customerUserId: z.string().max(120).optional(),
+  storeTrx: z.string().max(120).optional(),
+  metadata: z.record(z.unknown()).optional(),
+  redirectUrl: safeExternalUrl.optional(),
+  callbackUrl: safeExternalUrl.optional(),
 });
 
 export const Route = createFileRoute("/api/public/payments/create")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKeyId = await authenticateApiKey(request);
-        if (!apiKeyId) {
+        const apiKey = await authenticateApiKey(request, "store");
+        if (!apiKey) {
           return Response.json({ error: "Invalid or inactive API key" }, { status: 401 });
         }
 
@@ -44,12 +48,17 @@ export const Route = createFileRoute("/api/public/payments/create")({
           );
         }
         const input = parsedInput.data;
-        const redirectUrl = input.redirectUrl ?? request.headers.get("x-redirect-url") ?? null;
-        const callbackUrl = input.callbackUrl ?? request.headers.get("x-callback-url") ?? null;
+        const urls = z.object({ redirectUrl: safeExternalUrl.nullable(), callbackUrl: safeExternalUrl.nullable() }).safeParse({
+          redirectUrl: input.redirectUrl ?? request.headers.get("x-redirect-url") ?? null,
+          callbackUrl: input.callbackUrl ?? request.headers.get("x-callback-url") ?? null,
+        });
+        if (!urls.success) return Response.json({ error: "Invalid callback or redirect URL" }, { status: 400 });
+        const { redirectUrl, callbackUrl } = urls.data;
+        if (apiKey.merchantId && input.merchantId && apiKey.merchantId !== input.merchantId) return Response.json({ error: "Key is restricted to another merchant" }, { status: 403 });
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-        let merchantId = input.merchantId ?? null;
+        let merchantId = apiKey.merchantId ?? input.merchantId ?? null;
         if (merchantId) {
           const { data: merchant } = await supabaseAdmin
             .from("merchants")
@@ -85,18 +94,22 @@ export const Route = createFileRoute("/api/public/payments/create")({
             order_id: input.orderId?.trim() || null,
             customer_name: input.customerName?.trim() || null,
             customer_phone: input.customerPhone?.trim() || null,
+            customer_user_id: input.customerUserId?.trim() || null,
+            store_trx: input.storeTrx?.trim() || input.orderId?.trim() || null,
+            metadata: input.metadata as never ?? {},
             redirect_url: redirectUrl?.trim() || null,
             callback_url: callbackUrl?.trim() || null,
           })
-          .select("id")
+          .select("id, gateway_trx, expires_at")
           .single();
         if (error || !created) {
+          if (error?.code === "23505") return Response.json({ error: "Store transaction reference already exists; use a unique storeTrx for each order" }, { status: 409 });
           return Response.json({ error: error?.message ?? "Insert failed" }, { status: 500 });
         }
 
         const id = created["id"] as string;
         const origin = new URL(request.url).origin;
-        return Response.json({ id, paymentUrl: `${origin}/pay/${id}` });
+        return Response.json({ id, gatewayTrx: created.gateway_trx, expiresAt: created.expires_at, paymentUrl: `${origin}/pay/${id}` });
       },
     },
   },

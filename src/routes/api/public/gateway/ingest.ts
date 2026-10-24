@@ -19,7 +19,7 @@ const messageSchema = z.object({
 const ingestSchema = z.object({
   deviceId: z.string().min(1).max(64),
   platform: z.enum(["android", "ios", "other"]).default("android"),
-  phoneNumber: z.string().max(20).optional(),
+  phoneNumber: z.string().regex(/^(?:\+?88)?01[3-9][0-9]{8,9}$/),
   messages: z.array(messageSchema).min(1).max(200),
 });
 
@@ -27,8 +27,8 @@ export const Route = createFileRoute("/api/public/gateway/ingest")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKeyId = await authenticateApiKey(request);
-        if (!apiKeyId) {
+        const apiKey = await authenticateApiKey(request, "ingest");
+        if (!apiKey) {
           return Response.json({ error: "Invalid or inactive API key" }, { status: 401 });
         }
 
@@ -50,9 +50,11 @@ export const Route = createFileRoute("/api/public/gateway/ingest")({
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const now = new Date().toISOString();
 
-        await supabaseAdmin.from("gateway_devices").upsert(
+        const { data: device } = await supabaseAdmin.from("gateway_devices").select("api_key_id, is_active").eq("device_id", input.deviceId).maybeSingle();
+        if (device && (!device.is_active || device.api_key_id !== apiKey.id)) return Response.json({ error: "Device inactive or belongs to another key" }, { status: 403 });
+        const { error: deviceError } = await supabaseAdmin.from("gateway_devices").upsert(
           {
-            api_key_id: apiKeyId,
+            api_key_id: apiKey.id,
             device_id: input.deviceId,
             platform: input.platform,
             phone_number: input.phoneNumber ? normalizePhone(input.phoneNumber) : null,
@@ -62,13 +64,15 @@ export const Route = createFileRoute("/api/public/gateway/ingest")({
           { onConflict: "device_id" },
         );
 
+        if (deviceError) return Response.json({ error: "Could not register device" }, { status: 500 });
+
         const parsedRows = input.messages.flatMap((message) => {
           const parsed = parseSms(message.sender, message.body);
           if (!parsed || !parsed.trxId) return [];
           // account_number = receiving wallet (this phone); payer_number = customer wallet from the SMS body.
           const accountNumber = input.phoneNumber ? normalizePhone(input.phoneNumber) : null;
           return [{ parsed: { ...parsed, accountNumber }, row: {
-            payer_number: parsed.accountNumber ?? null,
+            payer_number: parsed.isCredit ? parsed.counterparty : null,
             sender: message.sender, body: message.body, provider: parsed.provider,
             account_type: parsed.accountType, is_credit: parsed.isCredit,
             trx_id: parsed.trxId, amount: parsed.amount, account_number: accountNumber,

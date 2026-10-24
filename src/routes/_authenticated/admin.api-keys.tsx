@@ -6,8 +6,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Copy, KeyRound, Smartphone } from "lucide-react";
 import { toast } from "sonner";
-import { createApiKey, deleteApiKey, listApiKeys, listGateway, toggleApiKey } from "@/lib/serverfns/admin";
+import { createApiKey, deleteApiKey, listApiKeys, listGateway, listMerchants, toggleApiKey } from "@/lib/serverfns/admin";
 import { EmptyState, LoadingRows, PageHeader, Panel, StatusBadge, fieldClass } from "@/components/admin-ui";
+import { StoreApiGuide } from "@/components/store-api-guide";
 import { formatBdt } from "@/lib/providers";
 
 export const Route = createFileRoute("/_authenticated/admin/api-keys")({
@@ -24,6 +25,10 @@ function ApiKeys() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ["keys"], queryFn: () => list() });
   const { data: gw } = useQuery({ queryKey: ["gateway"], queryFn: () => gateway() });
+  const merchants = useServerFn(listMerchants);
+  const { data: stores } = useQuery({ queryKey: ["merchants"], queryFn: () => merchants() });
+  const [scope, setScope] = useState<"store" | "ingest">("store");
+  const [merchantId, setMerchantId] = useState("");
   const [label, setLabel] = useState("");
   const [fresh, setFresh] = useState("");
   const refresh = () => qc.invalidateQueries({ queryKey: ["keys"] });
@@ -31,7 +36,7 @@ function ApiKeys() {
   async function add(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const r = await create({ data: { label } });
+      const r = await create({ data: { label, scope, merchantId } });
       setFresh(r.key); setLabel(""); refresh();
     } catch (x) { toast.error((x as Error).message); }
   }
@@ -47,6 +52,8 @@ function ApiKeys() {
       <Panel title="API keys">
         <form onSubmit={add} className="flex flex-wrap gap-2 border-b border-border p-5">
           <input required placeholder="Label, e.g. Android phone 1" value={label} onChange={(e) => setLabel(e.target.value)} className={`${fieldClass} min-w-56 flex-1`} />
+          <select aria-label="Key scope" className={fieldClass} value={scope} onChange={(e) => setScope(e.target.value as "store" | "ingest")}><option value="store">Store API</option><option value="ingest">SMS phone</option></select>
+          {scope === "store" && <select required aria-label="Key merchant" className={fieldClass} value={merchantId} onChange={(e) => setMerchantId(e.target.value)}><option value="">Select merchant</option>{stores?.filter((m: any) => m.is_active).map((m: any) => <option key={m.id} value={m.id}>{m.name}</option>)}</select>}
           <Button className="h-10"><KeyRound /> Create key</Button>
         </form>
         {fresh && (
@@ -64,10 +71,10 @@ function ApiKeys() {
               <div key={k.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
                 <div>
                   <div className="flex items-center gap-2"><p className="font-semibold">{k.label}</p><StatusBadge status={k.is_active ? "active" : "inactive"} /></div>
-                  <p className="mt-0.5 font-mono text-xs text-muted-foreground">{k.key_prefix}… · last used {k.last_used_at ? new Date(k.last_used_at).toLocaleString() : "never"}</p>
+                  <p className="mt-0.5 font-mono text-xs text-muted-foreground">{k.key_prefix}… · {k.scope} · last used {k.last_used_at ? new Date(k.last_used_at).toLocaleString() : "never"}</p>
                 </div>
                 <div className="flex gap-1">
-                  <Button size="sm" variant="outline" onClick={async () => { await toggle({ data: { id: k.id, isActive: !k.is_active } }); refresh(); }}>{k.is_active ? "Disable" : "Enable"}</Button>
+                  <Button size="sm" variant="outline" onClick={async () => { try { await toggle({ data: { id: k.id, isActive: !k.is_active } }); refresh(); } catch (x) { toast.error((x as Error).message); } }}>{k.is_active ? "Disable" : "Enable"}</Button>
                   <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => del(k.id)}>Delete</Button>
                 </div>
               </div>
@@ -75,6 +82,8 @@ function ApiKeys() {
           </div>
         )}
       </Panel>
+
+      <StoreApiGuide />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.6fr]">
         <Panel title="Connected phones">
