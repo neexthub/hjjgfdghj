@@ -8,6 +8,6 @@ describe("number-free SMS connection", () => {
   it("resolves the key's store collection account", () => { expect(resolveSmsAccount(accounts, "store-a", "bkash", "personal", null)?.account_number).toBe("01712345678"); });
   it("cannot resolve another store", () => { expect(resolveSmsAccount(accounts, "store-b", "bkash", "personal", null)).toBeNull(); });
   it("does not guess with an unbound key", () => { expect(resolveSmsAccount(accounts, null, "bkash", "personal", null)).toBeNull(); });
-  it("does not guess between two receiving wallets", () => { expect(resolveSmsAccount([...accounts, { ...accounts[0], account_number: "01812345678" }], "store-a", "bkash", "personal", null)).toBeNull(); });
+  it("does not guess between two receiving wallets", () => { expect(resolveSmsAccount([...accounts, { merchant_id: "store-a", provider: "bkash", account_type: "personal", account_number: "01812345678" }], "store-a", "bkash", "personal", null)).toBeNull(); });
   it("separates merchant from personal messages", () => { expect(resolveSmsAccount(accounts, "store-a", "bkash", "merchant", null)).toBeNull(); });
 });
