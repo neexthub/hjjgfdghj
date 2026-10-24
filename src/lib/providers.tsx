@@ -134,7 +134,7 @@ export function ProviderLogo({
     <img
       src={PROVIDER_LOGO_URL[provider]}
       alt={PROVIDER_BRAND[provider].label}
-      className={`${className} w-auto max-w-full object-contain`}
+      className={`${className} aspect-square w-auto max-w-full object-contain`}
       draggable={false}
     />
   );
