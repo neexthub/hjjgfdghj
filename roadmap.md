@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Current request: Android release and end-to-end QA
+- [ ] Accept all incoming messages from the four wallet providers and verify eight personal/merchant examples; clarify setup readiness.
 - [ ] Complete branded Android setup/settings/dashboard and reliable delivery; test four-provider message rules.
 - [ ] Build and verify signed release APK; add working download in admin dashboard.
 - [ ] Verify signed-in admin and payment → SMS → callback → success redirect in a live browser.
