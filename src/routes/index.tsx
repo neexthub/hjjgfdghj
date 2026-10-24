@@ -49,7 +49,7 @@ function Index() {
           <div className="grid grid-cols-2 gap-3">
             {PROVIDER_ORDER.map((p) => (
               <div key={p} className="flex h-24 items-center justify-center rounded-2xl bg-card px-4 shadow-card-lg">
-                <ProviderLogo provider={p} className="h-10 max-w-full" />
+                <ProviderLogo provider={p} className="h-20" />
               </div>
             ))}
           </div>

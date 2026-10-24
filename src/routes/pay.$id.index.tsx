@@ -164,7 +164,7 @@ function Checkout() {
                 onClick={() => navigate({ to: "/pay/$id/$provider", params: { id, provider: p } })}
                 className="flex h-20 items-center justify-center rounded-xl border border-border bg-card shadow-card transition hover:-translate-y-0.5 hover:border-primary hover:shadow-card-lg disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:translate-y-0"
               >
-                <ProviderLogo provider={p} className="h-9" />
+                <ProviderLogo provider={p} className="h-16" />
               </button>
             );
           })}
