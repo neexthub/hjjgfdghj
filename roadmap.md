@@ -1,5 +1,9 @@
 # Roadmap
 
+## Admin Forbidden
+- [ ] Diagnose and fix authorization failures without weakening admin permissions.
+- [ ] Verify signed-in admin actions, or identify the missing account/access blocker.
+
 ## Number-free Android connection
 - [x] Remove receiving-number input; use only API URL and key.
 - [x] Read existing and incoming wallet SMS with explicit permission; server resolves receiving account safely and verifies TRX.
