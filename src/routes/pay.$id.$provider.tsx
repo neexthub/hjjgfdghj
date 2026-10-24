@@ -1,3 +1,4 @@
+import { Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NeextBrand } from "@/components/neext-brand";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -172,9 +173,7 @@ function ProviderPayPage() {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <span className="text-lg font-bold" >
-                    {info.merchant.name.trim().charAt(0).toUpperCase() || "M"}
-                  </span>
+                  <Store aria-label={info.merchant.name} className="h-6 w-6 text-muted-foreground" />
                 )}
               </div>
               <div className="min-w-0">
