@@ -149,11 +149,15 @@
 :root { --brand-lime: oklch(0.9 0.22 125); --brand-ink: oklch(0.20 0.015 165); --brand-surface: oklch(0.99 0 0); --bkash: #E2136E; --nagad: #EC6608; --upay: #009CA6; --rocket: #8C3494; }
 @theme inline { --color-brand-lime: var(--brand-lime); --color-brand-ink: var(--brand-ink); --color-brand-surface: var(--brand-surface); }
 @layer base { * { letter-spacing: 0 !important; } button, input, select, textarea { max-width: 100%; } }
-.brand-intro { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: var(--brand-ink); color: var(--brand-surface); }
-.intro-mark { animation: brand-reveal 1.2s ease-out both; }
-.intro-progress { height: 3px; background: var(--brand-lime); transform-origin: left; animation: intro-progress 5s linear both; }
-@keyframes brand-reveal { from { opacity: 0; transform: translateY(14px) scale(.9); } to { opacity: 1; transform: none; } }
+.brand-intro { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; overflow: hidden; background: radial-gradient(circle at 50% 42%, oklch(0.27 0.04 165), var(--brand-ink) 62%); color: var(--brand-surface); transition: opacity .45s ease, transform .45s ease; }
+.brand-intro-leave { opacity: 0; transform: scale(1.03); }
+.intro-glow { position: absolute; width: 420px; height: 420px; border-radius: 9999px; background: radial-gradient(circle, color-mix(in oklab, var(--brand-lime) 22%, transparent), transparent 65%); animation: intro-pulse 2.4s ease-in-out infinite; }
+.intro-mark { position: relative; animation: brand-reveal .7s cubic-bezier(.2,.8,.2,1) both; }
+.intro-logo-ring { display: grid; place-items: center; width: 96px; height: 96px; border-radius: 28px; background: color-mix(in oklab, var(--brand-surface) 6%, transparent); border: 1px solid color-mix(in oklab, var(--brand-surface) 14%, transparent); box-shadow: 0 20px 60px -20px color-mix(in oklab, var(--brand-lime) 45%, transparent); }
+.intro-progress { height: 100%; border-radius: 9999px; background: linear-gradient(90deg, var(--brand-lime), oklch(0.75 0.15 160)); transform-origin: left; animation: intro-progress 1.8s cubic-bezier(.4,0,.2,1) both; }
+@keyframes brand-reveal { from { opacity: 0; transform: translateY(12px) scale(.94); } to { opacity: 1; transform: none; } }
 @keyframes intro-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes intro-pulse { 0%,100% { opacity: .55; transform: scale(.92); } 50% { opacity: 1; transform: scale(1.05); } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 
 :root { --warning: oklch(0.8 0.15 80); --warning-foreground: oklch(0.45 0.1 65); }
