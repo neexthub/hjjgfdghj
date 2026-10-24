@@ -84,6 +84,8 @@ function ApiKeys() {
         )}
       </Panel>
 
+      <SmsAppGuide />
+
       <StoreApiGuide />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.6fr]">
