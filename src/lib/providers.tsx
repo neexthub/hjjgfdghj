@@ -1,14 +1,14 @@
 // Brand data, logos and Bengali payment instructions for the four supported
-import bkashLogo from "@/assets/providers/bkash-logo.svg.asset.json";
-import nagadLogo from "@/assets/providers/nagad-logo.svg.asset.json";
-import upayLogo from "@/assets/providers/upay-logo.svg.asset.json";
-import rocketLogo from "@/assets/providers/rocket-logo.svg.asset.json";
+import bkashLogo from "@/assets/providers/bkash.png";
+import nagadLogo from "@/assets/providers/nagad.png";
+import upayLogo from "@/assets/providers/upay.png";
+import rocketLogo from "@/assets/providers/rocket.png";
 
 const PROVIDER_LOGO_URL: Record<string, string> = {
-  bkash: bkashLogo.url,
-  nagad: nagadLogo.url,
-  upay: upayLogo.url,
-  rocket: rocketLogo.url,
+  bkash: bkashLogo,
+  nagad: nagadLogo,
+  upay: upayLogo,
+  rocket: rocketLogo,
 };
 // MFS providers. Client-safe: no server imports.
 
