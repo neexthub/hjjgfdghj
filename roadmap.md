@@ -1,6 +1,8 @@
 # Roadmap
 
 ## Current request: live QA and store API guide
+- [x] Recheck connected-phone SMS → payment window → signed callback → success redirect with fresh test keys (all four providers; API-simulated SMS and browser-intercepted return destination).
+- [x] Recheck admin access and report actual Android-device testing limitations (admin redirects to sign-in; no auth users; no Android source/APK in project).
 - [x] Add admin store API guide with request, response, callback and key examples.
 - [x] Test public pages, checkout and API-key authenticated create → SMS → verify → callback → redirect.
 - [x] Fix discovered functional failures and retain regression tests.
