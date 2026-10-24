@@ -1,4 +1,5 @@
-export const PAYMENT_INTRO_MS = 5000;
+export const PAYMENT_INTRO_MS = 1800;
+export function shouldShowIntro(pathname: string) { return pathname === "/admin" || pathname.startsWith("/admin/") || /^\/pay\/[^/]+/.test(pathname); }
 export function brandHead(title: string, description: string) {
   return { meta: [
     { title: `${title} — Neext Pay` },
