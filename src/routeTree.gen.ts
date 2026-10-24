@@ -17,6 +17,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as PayIdRouteImport } from './routes/pay.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminApiKeysRouteImport } from './routes/_authenticated/admin.api-keys'
+import { Route as AuthenticatedAdminIntegrationRouteImport } from './routes/_authenticated/admin.integration'
 import { Route as AuthenticatedAdminLinksRouteImport } from './routes/_authenticated/admin.links'
 import { Route as AuthenticatedAdminMerchantsRouteImport } from './routes/_authenticated/admin.merchants'
 import { Route as AuthenticatedAdminTransactionsRouteImport } from './routes/_authenticated/admin.transactions'
@@ -65,6 +66,12 @@ const AuthenticatedAdminApiKeysRoute =
   AuthenticatedAdminApiKeysRouteImport.update({
     id: '/api-keys',
     path: '/api-keys',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminIntegrationRoute =
+  AuthenticatedAdminIntegrationRouteImport.update({
+    id: '/integration',
+    path: '/integration',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminLinksRoute = AuthenticatedAdminLinksRouteImport.update({
@@ -122,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/pay/$id': typeof PayIdRouteWithChildren
   '/admin/api-keys': typeof AuthenticatedAdminApiKeysRoute
+  '/admin/integration': typeof AuthenticatedAdminIntegrationRoute
   '/admin/links': typeof AuthenticatedAdminLinksRoute
   '/admin/merchants': typeof AuthenticatedAdminMerchantsRoute
   '/admin/transactions': typeof AuthenticatedAdminTransactionsRoute
@@ -138,6 +146,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/index': typeof Char91indexChar93Route
   '/admin/api-keys': typeof AuthenticatedAdminApiKeysRoute
+  '/admin/integration': typeof AuthenticatedAdminIntegrationRoute
   '/admin/links': typeof AuthenticatedAdminLinksRoute
   '/admin/merchants': typeof AuthenticatedAdminMerchantsRoute
   '/admin/transactions': typeof AuthenticatedAdminTransactionsRoute
@@ -158,6 +167,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/pay/$id': typeof PayIdRouteWithChildren
   '/_authenticated/admin/api-keys': typeof AuthenticatedAdminApiKeysRoute
+  '/_authenticated/admin/integration': typeof AuthenticatedAdminIntegrationRoute
   '/_authenticated/admin/links': typeof AuthenticatedAdminLinksRoute
   '/_authenticated/admin/merchants': typeof AuthenticatedAdminMerchantsRoute
   '/_authenticated/admin/transactions': typeof AuthenticatedAdminTransactionsRoute
@@ -178,6 +188,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/pay/$id'
     | '/admin/api-keys'
+    | '/admin/integration'
     | '/admin/links'
     | '/admin/merchants'
     | '/admin/transactions'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/index'
     | '/admin/api-keys'
+    | '/admin/integration'
     | '/admin/links'
     | '/admin/merchants'
     | '/admin/transactions'
@@ -213,6 +225,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/pay/$id'
     | '/_authenticated/admin/api-keys'
+    | '/_authenticated/admin/integration'
     | '/_authenticated/admin/links'
     | '/_authenticated/admin/merchants'
     | '/_authenticated/admin/transactions'
@@ -295,6 +308,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminApiKeysRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/integration': {
+      id: '/_authenticated/admin/integration'
+      path: '/integration'
+      fullPath: '/admin/integration'
+      preLoaderRoute: typeof AuthenticatedAdminIntegrationRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/links': {
       id: '/_authenticated/admin/links'
       path: '/links'
@@ -363,6 +383,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminApiKeysRoute: typeof AuthenticatedAdminApiKeysRoute
+  AuthenticatedAdminIntegrationRoute: typeof AuthenticatedAdminIntegrationRoute
   AuthenticatedAdminLinksRoute: typeof AuthenticatedAdminLinksRoute
   AuthenticatedAdminMerchantsRoute: typeof AuthenticatedAdminMerchantsRoute
   AuthenticatedAdminTransactionsRoute: typeof AuthenticatedAdminTransactionsRoute
@@ -371,6 +392,7 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminApiKeysRoute: AuthenticatedAdminApiKeysRoute,
+  AuthenticatedAdminIntegrationRoute: AuthenticatedAdminIntegrationRoute,
   AuthenticatedAdminLinksRoute: AuthenticatedAdminLinksRoute,
   AuthenticatedAdminMerchantsRoute: AuthenticatedAdminMerchantsRoute,
   AuthenticatedAdminTransactionsRoute: AuthenticatedAdminTransactionsRoute,
