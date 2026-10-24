@@ -297,6 +297,7 @@ export type Database = {
           id: string
           is_credit: boolean
           matched_payment_id: string | null
+          payer_number: string | null
           provider: string | null
           received_at: string
           sender: string
@@ -312,6 +313,7 @@ export type Database = {
           id?: string
           is_credit?: boolean
           matched_payment_id?: string | null
+          payer_number?: string | null
           provider?: string | null
           received_at?: string
           sender: string
@@ -327,6 +329,7 @@ export type Database = {
           id?: string
           is_credit?: boolean
           matched_payment_id?: string | null
+          payer_number?: string | null
           provider?: string | null
           received_at?: string
           sender?: string
