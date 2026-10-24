@@ -113,7 +113,7 @@ export const updatePaymentStatus = createServerFn({ method: "POST" })
       const { data: payment } = await supabase
         .from("payments")
         .select(
-          "id, amount, order_id, callback_url, trx_id, verified_at, merchants(name, provider, account_number, callback_secret)",
+          "id, amount, order_id, callback_url, trx_id, verified_at, merchants(name, provider, account_number, callback_secret, callback_api_key)",
         )
         .eq("id", data.id)
         .maybeSingle();
@@ -363,4 +363,39 @@ export const updateApiKey = createServerFn({ method: "POST" })
     const { error } = await supabase.from("api_keys").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+export const saveMerchantIntegration = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string; callbackUrl?: string; successUrl?: string; regenerate?: "callback_key" | "callback_secret" }) => input)
+  .handler(async ({ data, context }) => {
+    const { supabase } = await requireAdmin(context);
+    const patch: Record<string, unknown> = {};
+    if (data.callbackUrl !== undefined) patch["callback_url"] = data.callbackUrl.trim() ? safeExternalUrl.parse(data.callbackUrl.trim()) : null;
+    if (data.successUrl !== undefined) patch["success_url"] = data.successUrl.trim() ? safeExternalUrl.parse(data.successUrl.trim()) : null;
+    if (data.regenerate === "callback_key") patch["callback_api_key"] = "ncb_" + randomHex(24);
+    if (data.regenerate === "callback_secret") patch["callback_secret"] = randomHex(24);
+    const { error } = await supabase.from("merchants").update(patch).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const sendTestCallback = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string }) => input)
+  .handler(async ({ data, context }) => {
+    const { supabase } = await requireAdmin(context);
+    const { data: m } = await supabase.from("merchants").select("id, name, callback_url, callback_secret, callback_api_key").eq("id", data.id).maybeSingle();
+    if (!m?.callback_url) throw new Error("Set a callback URL first");
+    const { createHmac } = await import("crypto");
+    const raw = JSON.stringify({ event: "payment.test", status: "complete", paymentId: "00000000-0000-0000-0000-000000000000", orderId: "TEST-ORDER", amount: 1, currency: "BDT", trxId: "TEST123", merchant: { id: m.id, name: m.name }, createdAt: new Date().toISOString() });
+    const headers: Record<string, string> = { "content-type": "application/json" };
+    if (m.callback_api_key) headers["x-callback-key"] = m.callback_api_key;
+    if (m.callback_secret) headers["x-neextpay-signature"] = "sha256=" + createHmac("sha256", m.callback_secret).update(raw).digest("hex");
+    try {
+      const res = await fetch(m.callback_url, { method: "POST", headers, body: raw, redirect: "error", signal: AbortSignal.timeout(8000) });
+      return { status: res.status, ok: res.ok };
+    } catch (e) {
+      return { status: 0, ok: false, error: (e as Error).message };
+    }
   });

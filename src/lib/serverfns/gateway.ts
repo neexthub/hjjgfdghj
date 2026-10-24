@@ -8,6 +8,7 @@ export type MerchantInfo = {
   provider: string | null;
   account_number: string | null;
   callback_secret: string | null;
+  callback_api_key?: string | null;
 };
 
 export function sha256Hex(value: string): string {
@@ -74,6 +75,7 @@ export async function sendPaymentCallback(payment: CallbackPayment): Promise<str
   const payload = buildCallbackPayload(payment, row, sms, merchant);
   const raw = JSON.stringify(payload);
   const headers: Record<string, string> = { "content-type": "application/json" };
+  if (merchant?.callback_api_key) headers["x-callback-key"] = merchant.callback_api_key;
   if (merchant?.callback_secret) {
     headers["x-neextpay-signature"] =
       "sha256=" +

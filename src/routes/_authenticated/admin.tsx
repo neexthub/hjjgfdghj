@@ -1,7 +1,7 @@
 import { NeextBrand } from "@/components/neext-brand";
 import { Button } from "@/components/ui/button";
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Activity, ArrowLeftRight, KeyRound, Link2, LogOut, Store } from "lucide-react";
+import { Activity, ArrowLeftRight, KeyRound, Plug, Link2, LogOut, Store } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { brandHead } from "@/lib/brand";
@@ -17,6 +17,7 @@ const NAV = [
   { to: "/admin/merchants", label: "Merchants", match: "exact", icon: Store },
   { to: "/admin/links", label: "Payment links", match: "exact", icon: Link2 },
   { to: "/admin/api-keys", label: "API & phones", match: "exact", icon: KeyRound },
+  { to: "/admin/integration", label: "Gateway integration", match: "exact", icon: Plug },
 ] as const;
 
 function AdminLayout() {
