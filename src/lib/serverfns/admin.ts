@@ -232,7 +232,7 @@ export const listApiKeys = createServerFn({ method: "GET" })
     const { supabase } = await requireAdmin(context);
     const { data, error } = await supabase
       .from("api_keys")
-      .select("id, label, key_prefix, is_active, last_used_at, created_at")
+      .select("id, label, key_prefix, is_active, last_used_at, created_at, scope, merchant_id")
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return data;
@@ -240,7 +240,7 @@ export const listApiKeys = createServerFn({ method: "GET" })
 
 export const createApiKey = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { label: string }) => input)
+  .inputValidator((input: { label: string; scope?: "store" | "ingest"; merchantId?: string }) => input)
   .handler(async ({ data, context }) => {
     const { supabase } = await requireAdmin(context);
     const plaintext = "npk_" + randomHex(24);
@@ -251,6 +251,8 @@ export const createApiKey = createServerFn({ method: "POST" })
         label: data.label.trim() || "Untitled key",
         key_hash: keyHash,
         key_prefix: plaintext.slice(0, 12),
+        scope: data.scope ?? "ingest",
+        merchant_id: data.scope === "store" ? data.merchantId || null : null,
       })
       .select("id, key_prefix, created_at")
       .single();
