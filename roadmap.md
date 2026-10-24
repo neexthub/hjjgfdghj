@@ -1,19 +1,22 @@
 # Roadmap
 
 ## Current request: Android release and end-to-end QA
-- [ ] Accept all incoming messages from the four wallet providers and verify eight personal/merchant examples; clarify setup readiness.
-- [ ] Complete branded Android setup/settings/dashboard and reliable delivery; test four-provider message rules.
-- [ ] Build and verify signed release APK; add working download in admin dashboard.
-- [ ] Verify signed-in admin and payment → SMS → callback → success redirect in a live browser.
-- [ ] Report physical-phone and production-hosting limitations; copied migration reset remains blocked by managed history rules.
+- [x] Accept all incoming messages from the four wallet providers and verify eight personal/merchant examples; clarify setup readiness.
+- [x] Complete branded Android setup/settings/dashboard and reliable delivery; test four-provider message rules.
+- [x] Build and verify signed release APK; add working download in admin dashboard.
+- [x] Verify eight personal/merchant payment → simulated SMS → HTTP callback delivery → browser success redirect flows.
+- [ ] Verify signed-in admin CRUD (blocked: no auth user).
+- [x] Report physical-phone and production-hosting limitations.
+- [ ] Physical Android UI/background/SMS tests (blocked: requires a real phone).
+- [ ] Copied migration reset (blocked: managed history cannot be cleared).
 
 ## Current request: Android source
-- [ ] Create Android folder with native first-run API setup, settings and dashboard.
-- [ ] Add SMS receiver, durable offline queue/retries, foreground notification and recovery controls.
-- [ ] Add local build guide and verify source/tests; report device/build limitations.
+- [x] Create Android folder with native first-run API setup, settings and dashboard.
+- [x] Add SMS receiver, durable offline queue/retries, foreground notification and recovery controls.
+- [x] Add local build guide and verify source/tests; report device/build limitations.
 
 ## Current request: app loading
-- [ ] Fix the missing /index entry and verify homepage navigation in a live browser.
+- [x] Fix the missing /index entry and verify homepage navigation in a live browser.
 
 ## Current request: live QA and store API guide
 - [x] Recheck connected-phone SMS → payment window → signed callback → success redirect with fresh test keys (all four providers; API-simulated SMS and browser-intercepted return destination).
@@ -24,8 +27,8 @@
 - [ ] Test signed-in admin CRUD (blocked: no signed-up auth user).
 
 ## Store integration and Android SMS sender
-- [ ] Build and test downloadable Android SMS sender with offline retries.
-- [ ] Design and apply a NeextPay logo to web and Android app.
+- [x] Build and test downloadable Android SMS sender with offline retries.
+- [x] Design and apply a NeextPay logo to web and Android app.
 - [ ] Add store callback URL/API key settings and store-scoped API keys.
 - [ ] Add create/list/details/delete/cancel payment APIs and separate transaction references.
 - [ ] Save submitted wallet TRX IDs, verify, notify the store and redirect on success.
