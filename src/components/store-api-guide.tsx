@@ -56,6 +56,6 @@ if (a.length !== b.length || !timingSafeEqual(a, b)) return unauthorized();
 const payment = JSON.parse(rawBody);
 // Check orderId, amount, currency; process paymentId only once.
 // Persist the paid order, then respond HTTP 200.`} />
-    <p className="text-sm text-muted-foreground">Merchants থেকে callback secret কপি করুন। callback_status: sent, no_url, http_৪xx/৫xx বা error। স্বয়ংক্রিয় callback retry এখন নেই; ব্যর্থ হলে অর্ডার paid ধরে নেবেন না। 400 = ভুল তথ্য, 401 = ভুল/বন্ধ কী, 403 = ভুল scope/স্টোর, 404 = পেমেন্ট নেই, 500 = সার্ভার সমস্যা। পেমেন্ট list/details/cancel/delete-এর আলাদা স্টোর endpoint এখন নেই।</p>
+    <p className="text-sm text-muted-foreground">Merchants থেকে callback secret কপি করুন। callback_status: sent, no_url, http_৪xx/৫xx বা error। স্বয়ংক্রিয় callback retry এখন নেই; ব্যর্থ হলে অর্ডার paid ধরে নেবেন না। 400 = ভুল তথ্য, 401 = ভুল/বন্ধ কী, 403 = ভুল scope/স্টোর, 404 = পেমেন্ট নেই, 409 = storeTrx আগে ব্যবহৃত হয়েছে, 500 = সার্ভার সমস্যা। পেমেন্ট list/details/cancel/delete-এর আলাদা স্টোর endpoint এখন নেই।</p>
   </section>;
 }
