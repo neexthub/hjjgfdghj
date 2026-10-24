@@ -1,5 +1,8 @@
 # Roadmap
 
+## Current request: app loading
+- [ ] Fix the missing /index entry and verify homepage navigation in a live browser.
+
 ## Current request: live QA and store API guide
 - [x] Recheck connected-phone SMS → payment window → signed callback → success redirect with fresh test keys (all four providers; API-simulated SMS and browser-intercepted return destination).
 - [x] Recheck admin access and report actual Android-device testing limitations (admin redirects to sign-in; no auth users; no Android source/APK in project).
