@@ -1,3 +1,4 @@
+import { Store } from "lucide-react";
 import { NeextBrand } from "@/components/neext-brand";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
@@ -109,7 +110,6 @@ function Checkout() {
   const byProvider = new Map<string, PayAccount>(
     info.accounts.map((a) => [a.provider, a]),
   );
-  const initial = info.merchant.name.trim().charAt(0).toUpperCase() || "M";
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -121,7 +121,7 @@ function Checkout() {
               {info.merchant.logoUrl ? (
                 <img src={info.merchant.logoUrl} alt={info.merchant.name} className="h-full w-full object-cover" />
               ) : (
-                <span className="text-2xl font-extrabold text-secondary-foreground">{initial}</span>
+                <Store aria-label={info.merchant.name} className="h-8 w-8 text-muted-foreground" />
               )}
             </div>
             <div className="min-w-0 flex-1">

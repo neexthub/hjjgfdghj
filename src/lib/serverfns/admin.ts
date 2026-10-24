@@ -160,6 +160,8 @@ export const saveMerchant = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase } = await requireAdmin(context);
     if (!data.name.trim()) throw new Error("Merchant name is required");
+    if (data.logoUrl && data.logoUrl.length > 400_000) throw new Error("Logo is too large");
+    if (data.logoUrl && !/^(https:\/\/|data:image\/(png|jpeg|webp);base64,)/.test(data.logoUrl)) throw new Error("Logo must be an image");
     const row = { name: data.name.trim(), logo_url: data.logoUrl || null, is_active: data.isActive ?? true };
     if (data.id) {
       const { error } = await supabase.from("merchants").update(row).eq("id", data.id);
@@ -259,6 +261,7 @@ export const createApiKey = createServerFn({ method: "POST" })
         key_prefix: plaintext.slice(0, 12),
         scope: data.scope ?? "ingest",
         merchant_id: data.merchantId,
+        key_secret: plaintext,
       })
       .select("id, key_prefix, created_at")
       .single();
@@ -313,4 +316,51 @@ export const listGateway = createServerFn({ method: "GET" })
     if (devices.error) throw new Error(devices.error.message);
     if (messages.error) throw new Error(messages.error.message);
     return { devices: devices.data ?? [], messages: messages.data ?? [] };
+  });
+
+export const deleteMerchant = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string }) => input)
+  .handler(async ({ data, context }) => {
+    const { supabase } = await requireAdmin(context);
+    const { count } = await supabase.from("payments").select("id", { count: "exact", head: true }).eq("merchant_id", data.id);
+    if (count) throw new Error("This merchant has payments — deactivate it instead of deleting.");
+    await supabase.from("api_keys").delete().eq("merchant_id", data.id);
+    await supabase.from("merchant_accounts").delete().eq("merchant_id", data.id);
+    const { error } = await supabase.from("merchants").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const deleteMerchantAccount = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string }) => input)
+  .handler(async ({ data, context }) => {
+    const { supabase } = await requireAdmin(context);
+    const { error } = await supabase.from("merchant_accounts").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const revealApiKey = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string }) => input)
+  .handler(async ({ data, context }) => {
+    const { supabase } = await requireAdmin(context);
+    const { data: row, error } = await supabase.from("api_keys").select("key_secret").eq("id", data.id).maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row?.key_secret) throw new Error("This older key can't be copied again — create a new key.");
+    return { key: row.key_secret as string };
+  });
+
+export const updateApiKey = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string; label: string; merchantId?: string }) => input)
+  .handler(async ({ data, context }) => {
+    const { supabase } = await requireAdmin(context);
+    const patch: Record<string, unknown> = { label: data.label.trim() || "Untitled key" };
+    if (data.merchantId) patch["merchant_id"] = data.merchantId;
+    const { error } = await supabase.from("api_keys").update(patch).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });

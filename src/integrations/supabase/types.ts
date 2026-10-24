@@ -21,6 +21,7 @@ export type Database = {
           is_active: boolean
           key_hash: string
           key_prefix: string
+          key_secret: string | null
           label: string
           last_used_at: string | null
           merchant_id: string | null
@@ -32,6 +33,7 @@ export type Database = {
           is_active?: boolean
           key_hash: string
           key_prefix: string
+          key_secret?: string | null
           label: string
           last_used_at?: string | null
           merchant_id?: string | null
@@ -43,6 +45,7 @@ export type Database = {
           is_active?: boolean
           key_hash?: string
           key_prefix?: string
+          key_secret?: string | null
           label?: string
           last_used_at?: string | null
           merchant_id?: string | null
