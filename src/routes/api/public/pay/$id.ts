@@ -21,12 +21,15 @@ export const Route = createFileRoute("/api/public/pay/$id")({
         const { data: payment } = await supabaseAdmin
           .from("payments")
           .select(
-            "id, amount, status, order_id, redirect_url, provider, account_number, account_type, merchants(name, logo_url, merchant_accounts(provider, account_number, account_type, is_active))",
+            "id, amount, status, order_id, redirect_url, provider, account_number, account_type, expires_at, deleted_at, merchants(name, logo_url, merchant_accounts(provider, account_number, account_type, is_active))",
           )
           .eq("id", params.id)
           .maybeSingle();
-        if (!payment) {
+        if (!payment || payment.deleted_at) {
           return Response.json({ error: "Payment not found" }, { status: 404 });
+        }
+        if (payment.status !== "complete" && (payment.status !== "pending" || Date.parse(payment.expires_at) <= Date.now())) {
+          return Response.json({ error: "This payment is expired or no longer payable" }, { status: 410 });
         }
         const merchantRaw = payment["merchants"] as unknown;
         const merchant = (Array.isArray(merchantRaw) ? merchantRaw[0] : merchantRaw) as
@@ -58,6 +61,7 @@ export const Route = createFileRoute("/api/public/pay/$id")({
           status: payment["status"],
           orderId: payment["order_id"],
           redirectUrl: payment["redirect_url"],
+          expiresAt: payment.expires_at,
           merchant: {
             name: merchant?.name ?? "Merchant",
             logoUrl: merchant?.logo_url ?? null,

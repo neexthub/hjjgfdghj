@@ -17,6 +17,7 @@ export type PayWindowData = {
   status: string;
   orderId: string | null;
   redirectUrl: string | null;
+  expiresAt: string;
   merchant: { name: string; logoUrl: string | null };
   accounts: PayAccount[];
 };

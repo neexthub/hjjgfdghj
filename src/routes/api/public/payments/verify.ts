@@ -40,7 +40,7 @@ export const Route = createFileRoute("/api/public/payments/verify")({
         const { data: payment } = await supabaseAdmin
           .from("payments")
           .select(
-            "id, amount, status, order_id, trx_id, callback_url, redirect_url, verified_at, provider, account_number, account_type, merchants(name, provider, account_number, callback_secret)",
+            "id, amount, status, order_id, trx_id, callback_url, redirect_url, verified_at, provider, account_number, account_type, expires_at, deleted_at, merchants(name, provider, account_number, callback_secret)",
           )
           .eq("id", parsedInput.data.paymentId)
           .maybeSingle();
@@ -52,10 +52,18 @@ export const Route = createFileRoute("/api/public/payments/verify")({
           return Response.json({ status: "complete", redirectUrl: payment["redirect_url"] });
         }
 
+        if (payment.deleted_at || payment.status !== "pending" || Date.parse(payment.expires_at) <= Date.now()) {
+          return Response.json({ status: "invalid", message: "This payment is expired or no longer payable." });
+        }
+        const { error: saveError } = await supabaseAdmin.from("payments")
+          .update({ user_verify_trx: trx }).eq("id", payment.id).eq("status", "pending");
+        if (saveError) return Response.json({ error: "Verification unavailable" }, { status: 500 });
+
         const { data: sms } = await supabaseAdmin
           .from("sms_transactions")
           .select("id, amount, account_number, provider, account_type, is_credit, matched_payment_id")
           .eq("trx_id", trx)
+          .eq("is_credit", true)
           .is("matched_payment_id", null)
           .order("created_at", { ascending: true })
           .limit(1)

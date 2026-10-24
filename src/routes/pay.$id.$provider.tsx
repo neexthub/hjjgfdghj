@@ -71,7 +71,7 @@ function ProviderPayPage() {
         return;
       }
       setInfo(res.data);
-      setPhase("ready");
+      setPhase(res.data.status === "complete" ? "complete" : "ready");
     })();
     return () => {
       alive = false;
