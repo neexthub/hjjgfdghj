@@ -72,7 +72,7 @@ export const Route = createFileRoute("/api/public/gateway/ingest")({
           // account_number = receiving wallet (this phone); payer_number = customer wallet from the SMS body.
           const accountNumber = input.phoneNumber ? normalizePhone(input.phoneNumber) : null;
           return [{ parsed: { ...parsed, accountNumber }, row: {
-            payer_number: parsed.accountNumber ?? null,
+            payer_number: parsed.isCredit ? parsed.counterparty : null,
             sender: message.sender, body: message.body, provider: parsed.provider,
             account_type: parsed.accountType, is_credit: parsed.isCredit,
             trx_id: parsed.trxId, amount: parsed.amount, account_number: accountNumber,

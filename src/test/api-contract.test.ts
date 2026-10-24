@@ -1,8 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { safeExternalUrl } from "@/lib/api-contract";
 import { buildCallbackPayload } from "@/lib/serverfns/gateway";
+import { parseSms } from "@/lib/sms";
 
 describe("store integration", () => {
+  it("extracts the payer separately from a merchant ID", () => {
+    const sms = parseSms("NAGAD", "You have received BDT 501.25 in your Nagad account from 01812345678. TxnID: QA12345678, Fee Tk 0.00, Balance 1,501.25");
+    expect(sms?.counterparty).toBe("01812345678");
+    expect(sms?.accountNumber).toBeNull();
+  });
   it("rejects non-HTTP callbacks and private literal destinations", () => {
     for (const url of ["file:///etc/passwd", "http://127.0.0.1/", "http://localhost/", "https://user:pass@example.com/", "http://[::1]/"]) expect(safeExternalUrl.safeParse(url).success).toBe(false);
     expect(safeExternalUrl.safeParse("https://shop.example.com/paid").success).toBe(true);
