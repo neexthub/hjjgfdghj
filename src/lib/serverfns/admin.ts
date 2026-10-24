@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { safeExternalUrl } from "@/lib/api-contract";
 
 type Ctx = {
   supabase: any;
@@ -203,6 +204,8 @@ export const createPaymentLink = createServerFn({ method: "POST" })
     if (!(data.amount > 0) || data.amount > 10_000_000) {
       throw new Error("Amount must be greater than 0");
     }
+    const redirectUrl = data.redirectUrl?.trim() ? safeExternalUrl.parse(data.redirectUrl.trim()) : null;
+    const callbackUrl = data.callbackUrl?.trim() ? safeExternalUrl.parse(data.callbackUrl.trim()) : null;
     const { data: merchant } = await supabase.from("merchants").select("id").eq("id", data.merchantId).eq("is_active", true).maybeSingle();
     if (!merchant) throw new Error("Merchant is inactive or missing");
     const { data: accounts } = await supabase.from("merchant_accounts").select("id").eq("merchant_id", data.merchantId).eq("is_active", true);
@@ -215,8 +218,8 @@ export const createPaymentLink = createServerFn({ method: "POST" })
         order_id: data.orderId?.trim() || null,
         customer_name: data.customerName?.trim() || null,
         customer_phone: data.customerPhone?.trim() || null,
-        redirect_url: data.redirectUrl?.trim() || null,
-        callback_url: data.callbackUrl?.trim() || null,
+        redirect_url: redirectUrl,
+        callback_url: callbackUrl,
       })
       .select("id")
       .single();

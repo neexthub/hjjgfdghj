@@ -2,7 +2,7 @@ import { brandHead } from "@/lib/brand";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowUpRight, CheckCircle2, Clock, Coins, Receipt } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Clock, Coins, Download, Receipt } from "lucide-react";
 import { getDashboard } from "@/lib/serverfns/admin";
 import { EmptyState, LoadingRows, PageHeader, Panel, StatusBadge } from "@/components/admin-ui";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ function Dashboard() {
         eyebrow="Overview"
         title="Dashboard"
         description="Live summary of payments collected through your accounts."
-        actions={<Button asChild><Link to="/admin/links">New payment link <ArrowUpRight /></Link></Button>}
+        actions={<div className="flex flex-wrap gap-2"><Button asChild variant="outline"><a href="/downloads/neext-pay-release.apk" download>Android APK <Download /></a></Button><Button asChild><Link to="/admin/links">New payment link <ArrowUpRight /></Link></Button></div>}
       />
       {error && <p className="rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive">{(error as Error).message}</p>}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
