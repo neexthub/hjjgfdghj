@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { createApiKey, deleteApiKey, listApiKeys, listGateway, listMerchants, toggleApiKey } from "@/lib/serverfns/admin";
 import { EmptyState, LoadingRows, PageHeader, Panel, StatusBadge, fieldClass } from "@/components/admin-ui";
 import { StoreApiGuide } from "@/components/store-api-guide";
+import { SmsAppGuide } from "@/components/sms-app-guide";
 import { formatBdt } from "@/lib/providers";
 
 export const Route = createFileRoute("/_authenticated/admin/api-keys")({
@@ -82,6 +83,8 @@ function ApiKeys() {
           </div>
         )}
       </Panel>
+
+      <SmsAppGuide />
 
       <StoreApiGuide />
 
