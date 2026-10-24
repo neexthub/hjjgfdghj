@@ -124,7 +124,7 @@ function Merchants() {
                   {m.merchant_accounts.map((a) => (
                     <div key={a.id} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2.5">
                       <div className="flex items-center gap-3">
-                        <ProviderLogo provider={a.provider as Provider} className="h-6 w-14" />
+                        <ProviderLogo provider={a.provider as Provider} className="h-8" />
                         <div><p className="font-mono text-sm font-semibold">{a.account_number}</p><p className="text-xs capitalize text-muted-foreground">{a.account_type}</p></div>
                       </div>
                       <button type="button" onClick={() => toggleAccount(m, a)} className="text-xs font-semibold text-muted-foreground hover:text-foreground">{a.is_active ? "On" : "Off"}</button>
