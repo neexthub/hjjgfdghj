@@ -103,6 +103,7 @@ export const Route = createFileRoute("/api/public/payments/create")({
           .select("id, gateway_trx, expires_at")
           .single();
         if (error || !created) {
+          if (error?.code === "23505") return Response.json({ error: "Store transaction reference already exists; use a unique storeTrx for each order" }, { status: 409 });
           return Response.json({ error: error?.message ?? "Insert failed" }, { status: 500 });
         }
 
