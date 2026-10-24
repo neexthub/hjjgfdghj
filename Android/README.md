@@ -1,6 +1,6 @@
 # Neext Pay SMS gateway
 
-Native Android 6.0+ gateway for bKash, Nagad, Upay and Rocket. Uses the website's logo and emerald theme. Only matching incoming payment messages are queued; there is no inbox scraping or fabricated SMS counter.
+Native Android 6.0+ gateway for bKash, Nagad, Upay and Rocket. Uses the website's logo and emerald theme. Incoming messages identified with those wallet providers are forwarded; the server stores only parsed transactions and matches only credits. There is no inbox scraping or fabricated SMS counter. Provider messages can contain sensitive data; only connect to your trusted gateway.
 
 ## Build locally
 Install Android Studio, JDK 17 and Android SDK 35. Open this Android folder in Android Studio, or use the included Gradle wrapper from VS Code's terminal:

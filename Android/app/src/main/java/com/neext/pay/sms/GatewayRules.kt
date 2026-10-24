@@ -13,7 +13,6 @@ object GatewayRules {
     fun validPhone(value: String) = Regex("^(?:\\+?88)?01[3-9][0-9]{8,9}$").matches(value)
     fun paymentSms(sender: String, body: String): Boolean {
         val provider = Regex("bkash|b\\s?kash|nagad|upay|rocket|dbbl|dutch.?bangla|16247|16167|16793|16286", RegexOption.IGNORE_CASE)
-        val transaction = Regex("trx\\s*id|txn\\s*id|transaction\\s*id|txid|trx\\s*[:#]|txn\\s*[:#]", RegexOption.IGNORE_CASE)
-        return provider.containsMatchIn(sender + " " + body) && transaction.containsMatchIn(body)
+        return provider.containsMatchIn(sender + " " + body)
     }
 }

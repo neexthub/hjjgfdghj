@@ -4,8 +4,10 @@ import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tan
 import { Activity, ArrowLeftRight, KeyRound, Link2, LogOut, Store } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { brandHead } from "@/lib/brand";
 
 export const Route = createFileRoute("/_authenticated/admin")({
+  head: () => brandHead("Administration", "Manage Neext Pay payments, merchants and SMS phones."),
   component: AdminLayout,
 });
 
