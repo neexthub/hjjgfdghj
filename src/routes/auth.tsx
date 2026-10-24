@@ -27,7 +27,7 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
-  const [email, setEmail] = useState("admin@topsoftbd.com"); // default admin account
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -54,7 +54,7 @@ function AuthPage() {
           navigate({ to: "/admin" });
         } else {
           setNotice(
-            "Check your email to confirm the account. After confirming, sign in here. The first account created becomes an admin.",
+            "Check your email to confirm the account. After confirming, sign in here. Admin access requires approval.",
           );
         }
       }

@@ -1,5 +1,10 @@
 # Roadmap
 
+## Login and provider logos
+- [x] Start the login email field empty and remove misleading automatic-admin signup copy.
+- [ ] Replace provider logos with verified online assets and normalize their display sizes.
+- [ ] Verify login, logos and existing operator admin access; retain private-data authorization rather than granting public signups unrestricted access.
+
 ## Admin Forbidden
 - [x] Diagnose and fix authorization failures without weakening admin permissions.
 - [x] Verify signed-in merchant/account creation and toggles, API key creation/toggles/deletion, payment creation/status changes and dashboard readback.
