@@ -15,3 +15,5 @@
 
 - Store and SMS API keys enforce separate scopes; store reads and writes are merchant-scoped to prevent cross-store access.
 - Keep external URL validation in a shared client-safe API contract and document the actual endpoint contracts in the admin API section.
+- Keep the native Android gateway in Android with encrypted configuration, SQLite delivery queue, WorkManager retries and a foreground status service so SMS survives network interruptions without polling loops.
+- Build Android releases outside the web build, serve only verified signed APKs from public/downloads, and keep signing material outside source control so downloads never expose private keys.

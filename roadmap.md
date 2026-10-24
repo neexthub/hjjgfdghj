@@ -1,41 +1,12 @@
 # Roadmap
 
-## Current request: Android source
-- [ ] Create Android folder with native first-run API setup, settings and dashboard.
-- [ ] Add SMS receiver, durable offline queue/retries, foreground notification and recovery controls.
-- [ ] Add local build guide and verify source/tests; report device/build limitations.
+## Current request: Android release and end-to-end QA
+- [x] Accept all incoming messages from the four wallet providers and verify eight personal/merchant examples; clarify setup readiness.
+- [x] Complete branded Android setup/settings/dashboard and reliable delivery; test four-provider message rules.
+- [x] Build and verify signed release APK; add working download in admin dashboard.
+- [x] Verify eight personal/merchant payment → simulated SMS → HTTP callback delivery → browser success redirect flows.
+- [ ] Verify signed-in admin CRUD (blocked: no auth user).
+- [x] Report physical-phone and production-hosting limitations.
+- [ ] Physical Android UI/background/SMS tests (blocked: requires a real phone).
+- [ ] Copied migration reset (blocked: managed history cannot be cleared).
 
-## Current request: app loading
-- [ ] Fix the missing /index entry and verify homepage navigation in a live browser.
-
-## Current request: live QA and store API guide
-- [x] Recheck connected-phone SMS → payment window → signed callback → success redirect with fresh test keys (all four providers; API-simulated SMS and browser-intercepted return destination).
-- [x] Recheck admin access and report actual Android-device testing limitations (admin redirects to sign-in; no auth users; no Android source/APK in project).
-- [x] Add admin store API guide with request, response, callback and key examples.
-- [x] Test public pages, checkout and API-key authenticated create → SMS → verify → callback → redirect.
-- [x] Fix discovered functional failures and retain regression tests.
-- [ ] Test signed-in admin CRUD (blocked: no signed-up auth user).
-
-## Store integration and Android SMS sender
-- [ ] Build and test downloadable Android SMS sender with offline retries.
-- [ ] Design and apply a NeextPay logo to web and Android app.
-- [ ] Add store callback URL/API key settings and store-scoped API keys.
-- [ ] Add create/list/details/delete/cancel payment APIs and separate transaction references.
-- [ ] Save submitted wallet TRX IDs, verify, notify the store and redirect on success.
-- [ ] Add saved one-hour expiry, automatic cancellation and realtime checkout countdown.
-- [ ] Test admin, store APIs, wallet checkout, callback delivery and SMS app; fix failures.
-
-## Neext Pay refresh and real-flow QA
-- [ ] Rename gateway and apply shared modern theme to all pages.
-- [ ] Create logo intro video and show it on homepage/loading and checkout for five seconds.
-- [ ] Test signed-in admin sections and payment create → SMS ingest → verify → callback → redirect; fix errors.
-
-## Multi-provider SMS gateway (bKash, Nagad, Upay, Rocket)
-- [x] Migration: provider + account_number on merchants, provider/account_type/matched_payment_id on sms_transactions, gateway_devices table, callback signing secret
-- [x] Best-format SMS reader lib (personal + merchant formats, all 4 providers) + tests
-- [ ] Public gateway API: /api/public/gateway/ingest (API-key auth, batch SMS, auto-match to payments)
-- [ ] Public payment APIs: create payment (API-key), verify TRX, payment window data
-- [ ] Payment window page /pay/$id (copy merchant number, TRX verify, redirect)
-- [ ] Admin pages: dashboard, transactions, merchants (multi-provider), payment links, API keys, gateway
-- [ ] Callback REST calls signed with merchant callback secret
-- [ ] Verify end-to-end: create payment → ingest SMS → verify → callback
