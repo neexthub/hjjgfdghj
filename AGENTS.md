@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 - Keep branding and page metadata in shared client-safe modules; the root mounts the intro once to avoid duplicate checkout delays.
+- Preserve /index as a redirect to / so existing preview tabs and bookmarks reach the canonical homepage.
 - Express gateway styling through semantic global tokens so admin and checkout share a single theme.
 
 - Store and SMS API keys enforce separate scopes; store reads and writes are merchant-scoped to prevent cross-store access.
