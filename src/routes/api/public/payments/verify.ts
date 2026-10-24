@@ -40,7 +40,7 @@ export const Route = createFileRoute("/api/public/payments/verify")({
         const { data: payment } = await supabaseAdmin
           .from("payments")
           .select(
-            "id, amount, status, order_id, trx_id, callback_url, redirect_url, verified_at, provider, account_number, account_type, created_at, expires_at, deleted_at, merchants(name, provider, account_number, callback_secret)",
+            "id, amount, status, order_id, trx_id, callback_url, redirect_url, verified_at, provider, account_number, account_type, created_at, expires_at, deleted_at, merchants(name, provider, account_number, callback_secret, callback_api_key)",
           )
           .eq("id", parsedInput.data.paymentId)
           .maybeSingle();

@@ -111,7 +111,7 @@ export const Route = createFileRoute("/api/public/gateway/ingest")({
           const { data: pending } = await supabaseAdmin
             .from("payments")
             .select(
-              "id, amount, order_id, status, callback_url, trx_id, verified_at, provider, account_number, account_type, merchants(name, provider, account_number, callback_secret)",
+              "id, amount, order_id, status, callback_url, trx_id, verified_at, provider, account_number, account_type, merchants(name, provider, account_number, callback_secret, callback_api_key)",
             )
             .eq("status", "pending")
             .eq("merchant_id", entry.merchantId)

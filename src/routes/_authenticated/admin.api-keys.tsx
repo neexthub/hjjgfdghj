@@ -8,7 +8,6 @@ import { Copy, KeyRound, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { createApiKey, deleteApiKey, listApiKeys, listGateway, listMerchants, revealApiKey, toggleApiKey, updateApiKey } from "@/lib/serverfns/admin";
 import { EmptyState, LoadingRows, PageHeader, Panel, StatusBadge, fieldClass } from "@/components/admin-ui";
-import { StoreApiGuide } from "@/components/store-api-guide";
 import { SmsAppGuide } from "@/components/sms-app-guide";
 import { formatBdt } from "@/lib/providers";
 
@@ -110,7 +109,6 @@ function ApiKeys() {
 
       <SmsAppGuide />
 
-      <StoreApiGuide />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.6fr]">
         <Panel title="Connected phones">

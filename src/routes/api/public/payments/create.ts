@@ -58,17 +58,19 @@ export const Route = createFileRoute("/api/public/payments/create")({
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+        let defaults: { callbackUrl: string | null; redirectUrl: string | null } = { callbackUrl: null, redirectUrl: null };
         let merchantId = apiKey.merchantId ?? input.merchantId ?? null;
         if (merchantId) {
           const { data: merchant } = await supabaseAdmin
             .from("merchants")
-            .select("id")
+            .select("id, callback_url, success_url")
             .eq("id", merchantId)
             .eq("is_active", true)
             .maybeSingle();
           if (!merchant) {
             return Response.json({ error: "Merchant not found or inactive" }, { status: 400 });
           }
+          defaults = { callbackUrl: merchant.callback_url, redirectUrl: merchant.success_url };
         } else {
           const { data: merchant } = await supabaseAdmin
             .from("merchants")
@@ -97,8 +99,8 @@ export const Route = createFileRoute("/api/public/payments/create")({
             customer_user_id: input.customerUserId?.trim() || null,
             store_trx: input.storeTrx?.trim() || input.orderId?.trim() || null,
             metadata: input.metadata as never ?? {},
-            redirect_url: redirectUrl?.trim() || null,
-            callback_url: callbackUrl?.trim() || null,
+            redirect_url: redirectUrl?.trim() || defaults.redirectUrl || null,
+            callback_url: callbackUrl?.trim() || defaults.callbackUrl || null,
           })
           .select("id, gateway_trx, expires_at")
           .single();
