@@ -14,6 +14,11 @@
 - [x] Read existing and incoming wallet SMS with explicit permission; server resolves receiving account safely and verifies TRX.
 - [x] Test no-number ingest and rebuild signed update APK.
 
+## Per-user data and SMS cleanup
+- [x] Show personal and merchant wallets separately in the payment window.
+- [x] Isolate admin data per user account.
+- [x] Admin phones tab shows today's SMS with phone name; unmatched SMS auto-deleted after 1 day.
+
 ## Current request: Android release and end-to-end QA
 - [x] Accept all incoming messages from the four wallet providers and verify eight personal/merchant examples; clarify setup readiness.
 - [x] Complete branded Android setup/settings/dashboard and reliable delivery; test four-provider message rules.

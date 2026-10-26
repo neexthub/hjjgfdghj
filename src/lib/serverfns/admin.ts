@@ -295,6 +295,13 @@ export const deleteApiKey = createServerFn({ method: "POST" })
 
 // ---------- Gateway (collected SMS + devices) ----------
 
+function startOfDhakaDay(now = Date.now()) {
+  const offset = 6 * 60 * 60 * 1000;
+  const local = new Date(now + offset);
+  local.setUTCHours(0, 0, 0, 0);
+  return new Date(local.getTime() - offset).toISOString();
+}
+
 export const listGateway = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -302,7 +309,7 @@ export const listGateway = createServerFn({ method: "GET" })
     const [devices, messages] = await Promise.all([
       supabase
         .from("gateway_devices")
-        .select("*")
+        .select("*, api_keys(label)")
         .order("last_seen_at", { ascending: false, nullsFirst: false })
         .limit(50),
       supabase
@@ -310,12 +317,20 @@ export const listGateway = createServerFn({ method: "GET" })
         .select(
           "id, sender, body, provider, account_type, trx_id, amount, account_number, device_id, matched_payment_id, received_at",
         )
-        .order("created_at", { ascending: false })
-        .limit(100),
+        // Today only (Bangladesh time, UTC+6); unmatched SMS older than a day are purged hourly.
+        .gte("received_at", startOfDhakaDay())
+        .order("received_at", { ascending: false })
+        .limit(500),
     ]);
     if (devices.error) throw new Error(devices.error.message);
     if (messages.error) throw new Error(messages.error.message);
-    return { devices: devices.data ?? [], messages: messages.data ?? [] };
+    const deviceRows = (devices.data ?? []).map((d: any) => ({
+      ...d,
+      name: d.label ?? d.api_keys?.label ?? d.phone_number ?? d.device_id,
+    }));
+    const names = new Map(deviceRows.map((d: any) => [d.device_id, d.name]));
+    const messageRows = (messages.data ?? []).map((m: any) => ({ ...m, device_name: names.get(m.device_id) ?? m.device_id ?? "Unknown phone" }));
+    return { devices: deviceRows, messages: messageRows };
   });
 
 export const deleteMerchant = createServerFn({ method: "POST" })

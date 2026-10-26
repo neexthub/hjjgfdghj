@@ -19,3 +19,4 @@
 - Build Android releases outside the web build, serve only verified signed APKs from public/downloads, and keep signing material outside source control so downloads never expose private keys.
 - Resolve number-free SMS receivers from the merchant-bound ingest key and a unique provider/type collection account; leave ambiguous messages unmatched to prevent cross-store verification.
 - Import existing wallet SMS once through WorkManager after explicit read permission, while retaining the broadcast receiver for new messages to avoid continuous inbox polling.
+- Each signed-in admin owns their merchants, keys, phones and SMS (owner_id + RLS); payments/accounts inherit ownership from the merchant so users never see each other's data.
