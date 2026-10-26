@@ -25,6 +25,7 @@ export type Database = {
           label: string
           last_used_at: string | null
           merchant_id: string | null
+          owner_id: string | null
           scope: string
         }
         Insert: {
@@ -37,6 +38,7 @@ export type Database = {
           label: string
           last_used_at?: string | null
           merchant_id?: string | null
+          owner_id?: string | null
           scope?: string
         }
         Update: {
@@ -49,6 +51,7 @@ export type Database = {
           label?: string
           last_used_at?: string | null
           merchant_id?: string | null
+          owner_id?: string | null
           scope?: string
         }
         Relationships: [
@@ -71,6 +74,7 @@ export type Database = {
           label: string | null
           last_ip: string | null
           last_seen_at: string | null
+          owner_id: string | null
           phone_number: string | null
           platform: string
         }
@@ -83,6 +87,7 @@ export type Database = {
           label?: string | null
           last_ip?: string | null
           last_seen_at?: string | null
+          owner_id?: string | null
           phone_number?: string | null
           platform?: string
         }
@@ -95,6 +100,7 @@ export type Database = {
           label?: string | null
           last_ip?: string | null
           last_seen_at?: string | null
+          owner_id?: string | null
           phone_number?: string | null
           platform?: string
         }
@@ -158,6 +164,7 @@ export type Database = {
           logo_url: string | null
           nagad_number: string
           name: string
+          owner_id: string | null
           provider: string
           success_url: string | null
           website_origin: string | null
@@ -173,6 +180,7 @@ export type Database = {
           logo_url?: string | null
           nagad_number?: string
           name: string
+          owner_id?: string | null
           provider?: string
           success_url?: string | null
           website_origin?: string | null
@@ -188,6 +196,7 @@ export type Database = {
           logo_url?: string | null
           nagad_number?: string
           name?: string
+          owner_id?: string | null
           provider?: string
           success_url?: string | null
           website_origin?: string | null
@@ -300,6 +309,7 @@ export type Database = {
           id: string
           is_credit: boolean
           matched_payment_id: string | null
+          owner_id: string | null
           payer_number: string | null
           provider: string | null
           received_at: string
@@ -316,6 +326,7 @@ export type Database = {
           id?: string
           is_credit?: boolean
           matched_payment_id?: string | null
+          owner_id?: string | null
           payer_number?: string | null
           provider?: string | null
           received_at?: string
@@ -332,6 +343,7 @@ export type Database = {
           id?: string
           is_credit?: boolean
           matched_payment_id?: string | null
+          owner_id?: string | null
           payer_number?: string | null
           provider?: string | null
           received_at?: string
@@ -383,6 +395,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      owns_merchant: { Args: { _merchant: string }; Returns: boolean }
+      purge_unmatched_sms: { Args: never; Returns: number }
     }
     Enums: {
       app_role: "admin"

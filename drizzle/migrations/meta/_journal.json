@@ -15,6 +15,13 @@
       "when": 1792858799150,
       "tag": "0001_api_key_secret",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793006577441,
+      "tag": "0002_per_user_data_isolation",
+      "breakpoints": true
     }
   ]
 }
