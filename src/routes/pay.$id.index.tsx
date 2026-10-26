@@ -108,7 +108,8 @@ function Checkout() {
   }
 
   // One tile per active wallet account, so personal and merchant both show.
-  const tiles: { provider: (typeof PROVIDER_ORDER)[number]; account: PayAccount | null }[] = PROVIDER_ORDER.flatMap((p) => {
+  type Tile = { provider: (typeof PROVIDER_ORDER)[number]; account: PayAccount | null };
+  const tiles: Tile[] = PROVIDER_ORDER.flatMap((p): Tile[] => {
     const list = info.accounts
       .filter((a) => a.provider === p)
       .sort((a, b) => a.accountType.localeCompare(b.accountType));
