@@ -1,4 +1,4 @@
-import { Store } from "lucide-react";
+import { ShieldCheck, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NeextBrand } from "@/components/neext-brand";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -111,7 +111,7 @@ function ProviderPayPage() {
   if (!valid) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
-        <div className="w-full max-w-sm rounded-lg bg-card p-8 text-center shadow-xl">
+        <div className="w-full max-w-sm rounded-2xl bg-card p-8 text-center shadow-card-lg ring-1 ring-border">
           <p className="text-sm text-destructive">Unknown payment method.</p>
           <Link to="/pay/$id" params={{ id }} className="mt-3 inline-block text-sm font-medium text-primary">
             ← Back to checkout
@@ -124,7 +124,7 @@ function ProviderPayPage() {
   if (loadError) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
-        <div className="w-full max-w-sm rounded-lg bg-card p-8 text-center shadow-xl">
+        <div className="w-full max-w-sm rounded-2xl bg-card p-8 text-center shadow-card-lg ring-1 ring-border">
           <p className="text-sm text-destructive">{loadError}</p>
         </div>
       </div>
@@ -139,18 +139,47 @@ function ProviderPayPage() {
     ?? info?.accounts.find((a) => a.provider === provider);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <div className="mx-auto w-full max-w-md px-4 pb-10 pt-5">
-        <div className="mb-5 flex justify-center"><NeextBrand /></div>
+    <div className="relative flex min-h-screen flex-col overflow-x-hidden bg-background">
+      {/* Ambient provider-tinted glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-64"
+        style={{
+          background: `radial-gradient(ellipse 90% 70% at 50% -20%, color-mix(in srgb, ${brand.color} 18%, transparent), transparent 70%)`,
+        }}
+      />
+
+      <div className="relative mx-auto w-full max-w-md flex-1 px-4 pb-12 pt-7 sm:max-w-lg">
+        <div className="mb-5 flex flex-col items-center gap-1.5">
+          <NeextBrand />
+          <p className="flex items-center gap-1 text-[11px] font-semibold text-muted-foreground">
+            <ShieldCheck className="h-3.5 w-3.5 text-primary" /> নিরাপদ পেমেন্ট গেটওয়ে
+          </p>
+        </div>
+
         {/* Provider header */}
-        <div className="flex items-center justify-center rounded-2xl bg-card py-5 shadow-card ring-1 ring-border">
-          <ProviderLogo provider={provider} className="h-10" />
+        <div
+          className="flex items-center justify-center gap-3 rounded-3xl py-5 shadow-card-lg"
+          style={{
+            background: `linear-gradient(135deg, color-mix(in srgb, ${brand.color} 12%, var(--card)), var(--card))`,
+            boxShadow: `0 16px 40px -18px color-mix(in srgb, ${brand.color} 45%, transparent)`,
+          }}
+        >
+          <ProviderLogo provider={provider} className="h-12 sm:h-14" />
+          <div>
+            <p className="text-base font-extrabold text-foreground">{brand.label}</p>
+            {account ? (
+              <p className="text-[11px] font-semibold text-muted-foreground">
+                {account.accountType === "merchant" ? "Merchant অ্যাকাউন্ট" : "Personal অ্যাকাউন্ট"}
+              </p>
+            ) : null}
+          </div>
         </div>
 
         {!info || phase === "loading" ? (
           <p className="py-10 text-center text-sm text-muted-foreground">Loading payment…</p>
         ) : !account ? (
-          <div className="mt-4 rounded-lg bg-card p-6 text-center shadow-sm ring-1 ring-border">
+          <div className="mt-4 rounded-2xl bg-card p-6 text-center shadow-card ring-1 ring-border">
             <p className="text-sm text-muted-foreground">
               {brand.label} এই পেমেন্টে চালু নেই।
             </p>
@@ -164,82 +193,87 @@ function ProviderPayPage() {
           </div>
         ) : (
           <>
-            {/* Merchant card */}
-            <div className="mt-4 flex items-center gap-3 rounded-lg bg-card p-4 shadow-sm ring-1 ring-border">
-              <div
-                className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-secondary ring-1 ring-border"
-                
-              >
-                {info.merchant.logoUrl ? (
-                  <img
-                    src={info.merchant.logoUrl}
-                    alt={info.merchant.name}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <Store aria-label={info.merchant.name} className="h-6 w-6 text-muted-foreground" />
-                )}
+            {/* Merchant + amount card — all details visible */}
+            <div className="mt-4 overflow-hidden rounded-2xl bg-card shadow-card ring-1 ring-border">
+              <div className="flex items-center gap-3 p-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-secondary ring-1 ring-border">
+                  {info.merchant.logoUrl ? (
+                    <img
+                      src={info.merchant.logoUrl}
+                      alt={info.merchant.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <Store aria-label={info.merchant.name} className="h-6 w-6 text-muted-foreground" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="break-words text-sm font-semibold text-foreground">
+                    {info.merchant.name}
+                  </p>
+                  <p className="break-all text-xs text-muted-foreground">
+                    Reference: <span className="font-mono">{info.orderId ?? "—"}</span>
+                  </p>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-foreground">
-                  {info.merchant.name}
-                </p>
-                <p className="truncate text-xs text-muted-foreground">
-                  Reference: {info.orderId ?? "—"}
-                </p>
+              <div className="flex items-center justify-between border-t border-dashed border-border bg-secondary/50 px-4 py-3">
+                <span className="text-xs font-semibold text-muted-foreground">পরিশোধযোগ্য</span>
+                <span className="text-2xl font-extrabold tabular-nums text-foreground">
+                  ৳{formatBdt(info.amount)}
+                </span>
               </div>
             </div>
 
-            {/* Amount box */}
-            <div className="mt-3 rounded-lg bg-card px-4 py-3 shadow-sm ring-1 ring-border">
-              <p className="text-xl font-bold tabular-nums text-foreground">
-                ৳ {formatBdt(info.amount)}
-              </p>
-            </div>
-
-            {/* Instructions panel */}
+            {/* Numbered instructions panel */}
             <div
-              className="mt-4 rounded-2xl p-5 text-primary-foreground shadow-card-lg"
-              style={{ background: brand.panelColor }}
+              className="mt-4 rounded-3xl p-5 text-primary-foreground"
+              style={{
+                background: `linear-gradient(160deg, ${brand.panelColor}, color-mix(in srgb, ${brand.panelColor} 78%, black))`,
+                boxShadow: `0 20px 44px -18px color-mix(in srgb, ${brand.panelColor} 55%, transparent)`,
+              }}
             >
-              <p className="mb-3 rounded-lg bg-card px-3 py-2 text-center text-sm font-semibold text-foreground">
+              <p className="mb-4 rounded-xl bg-card/95 px-3 py-2 text-center text-sm font-bold text-foreground shadow-sm">
                 নিচের ধাপগুলো অনুসরণ করুন
               </p>
-              <ul className="space-y-2.5 text-xs leading-relaxed">
+              <ol className="space-y-3 text-xs leading-relaxed">
                 {buildPaySteps(provider, account.accountType, account.accountNumber, info.amount).map(
                   (step, i) => (
-                    <li key={i} className="flex gap-2">
-                      <span className="mt-1 block h-1 w-1 shrink-0 rounded-full bg-card/80" />
-                      <div>
+                    <li key={i} className="flex gap-2.5">
+                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-card/25 text-[10px] font-extrabold">
+                        {i + 1}
+                      </span>
+                      <div className="min-w-0 flex-1">
                         <span>{step.text}</span>
                         {step.kind === "number" ? (
-                          <span className="mt-1 flex items-center gap-2">
-                            <b className="text-sm tracking-wide">{step.number}</b>
+                          <span className="mt-1.5 flex flex-wrap items-center gap-2">
+                            <b className="break-all rounded-lg bg-card/15 px-2.5 py-1 text-sm tracking-wide">
+                              {step.number}
+                            </b>
                             <Button
                               type="button"
                               variant="secondary"
                               size="sm"
                               onClick={copyNumber}
-                              className="h-6 gap-1 bg-card px-2 text-[11px] font-bold text-foreground hover:bg-card/90"
+                              className="h-7 gap-1 bg-card px-2.5 text-[11px] font-bold text-foreground hover:bg-card/90"
                             >
                               <CopyIcon /> Copy
                             </Button>
                             {copied ? (
-                              <span className="text-[11px] font-bold text-primary-foreground">Copied ✓</span>
+                              <span className="text-[11px] font-bold">Copied ✓</span>
                             ) : null}
                           </span>
                         ) : null}
                         {step.kind === "amount" ? (
-                          <b className="text-sm" >
+                          <b className="text-sm">
                             {" "}
-                            {step.amount}
+                            ৳{step.amount}
                           </b>
                         ) : null}
                       </div>
                     </li>
                   ),
                 )}
-              </ul>
+              </ol>
 
               {/* TRX input inside the branded panel */}
               <input
@@ -248,12 +282,12 @@ function ProviderPayPage() {
                 placeholder="Transaction ID লিখুন"
                 aria-label="Transaction ID"
                 autoComplete="off"
-                className="mt-4 w-full rounded-lg border-0 bg-card px-3 py-2.5 text-sm font-medium tracking-wide text-foreground outline-none placeholder:text-muted-foreground"
+                className="mt-5 w-full rounded-xl border-0 bg-card px-4 py-3 text-sm font-semibold tracking-wide text-foreground shadow-inner outline-none ring-2 ring-transparent transition placeholder:font-normal placeholder:text-muted-foreground focus:ring-card/60"
               />
             </div>
 
             {notice ? (
-              <p className="mt-3 rounded-lg bg-card px-3 py-2 text-center text-xs text-foreground shadow-sm">
+              <p className="mt-3 rounded-xl bg-card px-3 py-2.5 text-center text-xs font-medium text-foreground shadow-card ring-1 ring-border">
                 {notice}
               </p>
             ) : null}
@@ -263,8 +297,11 @@ function ProviderPayPage() {
               onClick={() => void verify()}
               disabled={phase === "verifying" || trx.trim().length < 4}
               size="lg"
-              className="mt-4 h-12 w-full rounded-xl text-sm font-bold text-primary-foreground shadow-card-lg hover:opacity-90"
-              style={{ background: brand.color }}
+              className="mt-4 h-12 w-full rounded-2xl text-sm font-extrabold tracking-wide text-primary-foreground transition hover:opacity-90"
+              style={{
+                background: `linear-gradient(135deg, ${brand.color}, color-mix(in srgb, ${brand.color} 80%, black))`,
+                boxShadow: `0 14px 32px -12px color-mix(in srgb, ${brand.color} 60%, transparent)`,
+              }}
             >
               {phase === "verifying" ? "VERIFYING…" : "VERIFY"}
             </Button>
