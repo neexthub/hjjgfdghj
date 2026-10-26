@@ -117,20 +117,20 @@ function ApiKeys() {
               {gw.devices.map((d: any) => (
                 <div key={d.id} className="flex items-center gap-3 px-5 py-4 text-sm">
                   <Smartphone className="h-5 w-5 text-primary" />
-                  <div><p className="font-semibold">{d.label ?? d.phone_number ?? d.device_id}</p><p className="text-xs text-muted-foreground">Last seen {d.last_seen_at ? new Date(d.last_seen_at).toLocaleString() : "—"}</p></div>
+                  <div><p className="font-semibold">{d.name}</p><p className="text-xs text-muted-foreground">Last seen {d.last_seen_at ? new Date(d.last_seen_at).toLocaleString() : "—"}</p></div>
                 </div>
               ))}
             </div>
           )}
         </Panel>
-        <Panel title="Collected SMS">
-          {!gw ? <LoadingRows rows={3} /> : gw.messages.length === 0 ? <EmptyState title="No SMS collected yet" /> : (
+        <Panel title={`Today's SMS${gw ? ` (${gw.messages.length})` : ""}`}>
+          {!gw ? <LoadingRows rows={3} /> : gw.messages.length === 0 ? <EmptyState title="No SMS received today" hint="Unmatched SMS are deleted automatically after one day." /> : (
             <div className="max-h-[480px] divide-y divide-border overflow-y-auto">
               {gw.messages.map((m: any) => (
                 <div key={m.id} className="flex items-center justify-between gap-3 px-5 py-3 text-sm">
                   <div className="min-w-0">
                     <p className="font-mono text-xs font-semibold">{m.trx_id ?? "—"} <span className="ml-1 uppercase text-muted-foreground">{m.provider}</span></p>
-                    <p className="truncate text-xs text-muted-foreground">{m.account_number ?? m.sender} · {new Date(m.received_at).toLocaleString()}</p>
+                    <p className="truncate text-xs text-muted-foreground"><Smartphone className="mr-1 inline h-3 w-3" />{m.device_name} · {m.sender} · {new Date(m.received_at).toLocaleTimeString()}</p>
                   </div>
                   <div className="text-right">
                     <p className="font-semibold tabular-nums">{m.amount != null ? "৳" + formatBdt(m.amount) : "—"}</p>
