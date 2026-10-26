@@ -107,9 +107,13 @@ function Checkout() {
     return <PaySuccess amount={info.amount} redirectUrl={info.redirectUrl} />;
   }
 
-  const byProvider = new Map<string, PayAccount>(
-    info.accounts.map((a) => [a.provider, a]),
-  );
+  // One tile per active wallet account, so personal and merchant both show.
+  const tiles: { provider: (typeof PROVIDER_ORDER)[number]; account: PayAccount | null }[] = PROVIDER_ORDER.flatMap((p) => {
+    const list = info.accounts
+      .filter((a) => a.provider === p)
+      .sort((a, b) => a.accountType.localeCompare(b.accountType));
+    return list.length ? list.map((account) => ({ provider: p, account })) : [{ provider: p, account: null }];
+  });
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -151,20 +155,24 @@ function Checkout() {
 
         <p className="mb-2 mt-6 text-sm font-semibold text-muted-foreground">মোবাইল ব্যাংকিং — পেমেন্ট মাধ্যম বেছে নিন</p>
         <div className="grid grid-cols-2 gap-3">
-          {PROVIDER_ORDER.map((p) => {
-            const account = byProvider.get(p);
+          {tiles.map(({ provider: p, account }) => {
             const brand = PROVIDER_BRAND[p];
             return (
               <button
-                key={p}
+                key={`${p}-${account?.accountType ?? "off"}`}
                 type="button"
                 aria-label={brand.label}
                 disabled={!account}
                 title={account ? undefined : `${brand.label} এই পেমেন্টে চালু নেই`}
-                onClick={() => navigate({ to: "/pay/$id/$provider", params: { id, provider: p } })}
-                className="flex h-20 items-center justify-center rounded-xl border border-border bg-card shadow-card transition hover:-translate-y-0.5 hover:border-primary hover:shadow-card-lg disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:translate-y-0"
+                onClick={() => navigate({ to: "/pay/$id/$provider", params: { id, provider: p }, search: { type: account?.accountType === "merchant" ? "merchant" : "personal" } })}
+                className="relative flex h-20 items-center justify-center rounded-xl border border-border bg-card shadow-card transition hover:-translate-y-0.5 hover:border-primary hover:shadow-card-lg disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:translate-y-0"
               >
                 <ProviderLogo provider={p} className="h-16" />
+                {account ? (
+                  <span className="absolute right-1.5 top-1.5 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold text-secondary-foreground">
+                    {account.accountType === "merchant" ? "Merchant" : "Personal"}
+                  </span>
+                ) : null}
               </button>
             );
           })}

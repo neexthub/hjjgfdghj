@@ -20,6 +20,8 @@ import {
 
 export const Route = createFileRoute("/pay/$id/$provider")({
   ssr: false,
+  validateSearch: (search: Record<string, unknown>): { type?: "personal" | "merchant" } =>
+    search["type"] === "merchant" || search["type"] === "personal" ? { type: search["type"] } : {},
   head: ({ params }: { params: { provider: string } }) => ({
     meta: [
       {
@@ -49,6 +51,7 @@ function CopyIcon() {
 
 function ProviderPayPage() {
   const { id, provider: providerParam } = Route.useParams();
+  const { type } = Route.useSearch();
   const valid = isProviderId(providerParam);
   const provider = valid ? providerParam : "nagad";
   const brand = PROVIDER_BRAND[provider];
@@ -132,7 +135,8 @@ function ProviderPayPage() {
     return <PaySuccess amount={info.amount} redirectUrl={info.redirectUrl} />;
   }
 
-  const account = info?.accounts.find((a) => a.provider === provider);
+  const account = info?.accounts.find((a) => a.provider === provider && (!type || a.accountType === type))
+    ?? info?.accounts.find((a) => a.provider === provider);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
